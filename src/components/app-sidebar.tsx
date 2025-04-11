@@ -1,6 +1,6 @@
 import {
   BanknoteArrowDown,
-  Home as HomeIcon,
+  HomeIcon,
   WalletCards,
   BanknoteArrowUp,
   Settings,
