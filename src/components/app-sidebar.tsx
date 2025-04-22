@@ -37,7 +37,7 @@ const items = [
   },
   {
     title: "Vaste lasten",
-    to: "/vaste-lasten",
+    to: "/vastelasten",
     icon: WalletCards,
   },
   {

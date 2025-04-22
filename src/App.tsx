@@ -17,7 +17,7 @@ function App() {
           <Route index element={<Home />} />
           <Route path="expenses" element={<Expenses />} />
           <Route path="income" element={<Income />} />
-          <Route path="vaste-lasten" element={<Subscriptions />} />
+          <Route path="vastelasten" element={<Subscriptions />} />
           <Route path="settings" element={<Settings />} />
           <Route path="*" element={<div>404 - Pagina niet gevonden</div>} />
         </Route>
