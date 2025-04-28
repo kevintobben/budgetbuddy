@@ -1,7 +1,20 @@
+import React from "react";
 import { BaseTable } from "@/components/BaseTable";
 import PageLayout from "@/components/PageLayout";
 import OverviewCard from "@/components/OverviewCard";
 import { Pencil, Trash2 } from "lucide-react"
+import { Input } from "@/components/ui/input";
+import { DropdownMenuCheckboxItemProps } from "@radix-ui/react-dropdown-menu"
+import { Button } from "@/components/ui/button"
+import {
+  DropdownMenu,
+  DropdownMenuItem,
+  DropdownMenuCheckboxItem,
+  DropdownMenuContent,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 
 type IncomeRow = {
   name: string;
@@ -74,7 +87,13 @@ const incomeColumns = [
   }
 ];
 
+type Checked = DropdownMenuCheckboxItemProps["checked"]
+
 const Income: React.FC = () => {
+  const [showStatusBar, setShowStatusBar] = React.useState<Checked>(true)
+  const [showActivityBar, setShowActivityBar] = React.useState<Checked>(false)
+  const [showPanel, setShowPanel] = React.useState<Checked>(false)
+
   return (
     <PageLayout title="Inkomen">
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 place-items-center pb-12">
@@ -89,6 +108,56 @@ const Income: React.FC = () => {
           amountColor="text-red-500"
         />
       </div>
+
+      <div className="flex flex-wrap items-center justify-between pb-4">
+        <Input type="text" placeholder="Zoek op naam" className="w-64" />
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="outline" size="sm">
+              Sorteer
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent>
+            <DropdownMenuLabel>Sorteer op</DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem>Dag</DropdownMenuItem>
+            <DropdownMenuItem>Week</DropdownMenuItem>
+            <DropdownMenuItem>Maand</DropdownMenuItem>
+            <DropdownMenuItem>Jaar</DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="outline">Open</Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent className="w-56">
+            <DropdownMenuLabel>Appearance</DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            <DropdownMenuCheckboxItem
+              checked={showStatusBar}
+              onCheckedChange={setShowStatusBar}
+            >
+              Status Bar
+            </DropdownMenuCheckboxItem>
+            <DropdownMenuCheckboxItem
+              checked={showActivityBar}
+              onCheckedChange={setShowActivityBar}
+              disabled
+            >
+              Activity Bar
+            </DropdownMenuCheckboxItem>
+            <DropdownMenuCheckboxItem
+              checked={showPanel}
+              onCheckedChange={setShowPanel}
+            >
+              Panel
+            </DropdownMenuCheckboxItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
+
+
       <BaseTable columns={incomeColumns} data={incomeData} />
     </PageLayout>
   );
