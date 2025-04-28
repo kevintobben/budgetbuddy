@@ -76,7 +76,7 @@ const expenseColumns = [
 
 const Expenses: React.FC = () => {
   return (
-    <PageLayout title="Inkomen">
+    <PageLayout title="Uitgaven">
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 place-items-center pb-12">
         <OverviewCard
           title="Aantal inkomst bronnen"

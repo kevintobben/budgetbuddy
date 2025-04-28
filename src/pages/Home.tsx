@@ -3,7 +3,7 @@ import OverviewCard from "@/components/OverviewCard";
 
 const Home: React.FC = () => {
   return (
-    <PageLayout title="">
+    <PageLayout title="Overzicht" showDateFilters>
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 place-items-center">
       <OverviewCard
           title="Geld over deze maand"
