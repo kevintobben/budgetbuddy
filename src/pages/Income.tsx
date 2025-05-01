@@ -2,7 +2,7 @@ import React from "react";
 import { BaseTable } from "@/components/BaseTable";
 import PageLayout from "@/components/PageLayout";
 import OverviewCard from "@/components/OverviewCard";
-import { Pencil, Trash2 } from "lucide-react"
+import { Pencil, Plus, Trash2 } from "lucide-react"
 import { Input } from "@/components/ui/input";
 import { DropdownMenuCheckboxItemProps } from "@radix-ui/react-dropdown-menu"
 import { Button } from "@/components/ui/button"
@@ -109,7 +109,7 @@ const Income: React.FC = () => {
       </div>
 
       <div className="flex flex-wrap items-center justify-between gap-4 pb-4">
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2"> {/* Links */}
         <Input type="text" placeholder="Zoek op naam" className="w-64" />
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -140,7 +140,7 @@ const Income: React.FC = () => {
         </DropdownMenu>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2"> {/* Rechts */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="outline" size="sm">
@@ -195,6 +195,13 @@ const Income: React.FC = () => {
       </div>
 
       <BaseTable columns={incomeColumns} data={incomeData} />
+
+      <div className="fixed bottom-6 right-6 z-50">
+        <Button className="rounded-full w-12 h-12 p-0 shadow-lg" title="Toevoegen">
+          <Plus className="w-6 h-6" />
+        </Button>
+      </div>
+
     </PageLayout>
   );
 };
