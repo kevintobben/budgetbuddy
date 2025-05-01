@@ -94,17 +94,16 @@ const Expenses: React.FC = () => {
     const [showActivityBar, setShowActivityBar] = React.useState<Checked>(false)
     const [showPanel, setShowPanel] = React.useState<Checked>(false)
   return (
-    <PageLayout title="Uitgaven">
+    <PageLayout title="Uitgaven"> 
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 place-items-center pb-12">
         <OverviewCard
-          title="Aantal inkomst bronnen"
-          amount="€ 1600,00"
-          amountColor="text-green-600"
+          title="Aantal uitgeefposten"
+          amount="12" 
         />
         <OverviewCard
           title="Aatanl inkomen in €"
           amount="€ 1.120,00"
-          amountColor="text-red-500"
+          amountColor="text-green-500"
         />
       </div>
 
