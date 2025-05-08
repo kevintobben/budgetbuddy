@@ -15,77 +15,39 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 
 type ExpenseRow = {
   name: string;
-  amount: string;
+  amount: number;
   date: string;  
   category: string;
 }
 
-const ExpenseData: ExpenseRow[] = [
-  {
-    name: "Salaris",
-    amount: "€ 2.500,00",
-    date: "2023-10-01",
-    category: "Salaris",
-  },
-  {
-    name: "Huur",
-    amount: "€ 1.200,00",
-    date: "2023-10-05",
-    category: "Huur",
-  },
-  {
-    name: "Verhuur",
-    amount: "€ 800,00",
-    date: "2023-10-10",
-    category: "Verhuur",
-  },
-];
-
-const expenseColumns = [
-  {
-    header: "Naam",
-    key: "name" as keyof ExpenseRow,
-  },
-  {
-    header: "Bedrag",
-    key: "amount" as keyof ExpenseRow,
-    render: (value: string) => value,
-  },
+const expenseColumns = (onEdit: (row: ExpenseRow) => void, onDelete: (row: ExpenseRow) => void) => [
+  { header: "Naam", key: "name" as const },
+  { header: "Bedrag", key: "amount" as keyof ExpenseRow, render: (value: string | number) => new Intl.NumberFormat("nl-NL", { style: "currency", currency: "EUR",}).format(Number(value)), },
   {
     header: "Datum",
-    key: "date" as keyof ExpenseRow,
-    render: (value: string) => new Date(value).toLocaleDateString(),
+    key: "date" as const,
+    render: (value: string | number) => new Date(String(value)).toLocaleDateString("nl-NL"),
   },
-  {
-    header: "Categorie",
-    key: "category" as keyof ExpenseRow,
-  },
+  { header: "Categorie", key: "category" as const },
   {
     header: "Acties",
-    key: "name" as keyof ExpenseRow,
+    key: "name" as const,
     render: (_: unknown, row: ExpenseRow) => (
       <div className="flex gap-2">
-        <button
-          onClick={() => alert(`Bewerk ${row.name}`)}
-          className="hover:text-stone-700"
-          title="Bewerk"
-        >
+        <button onClick={() => onEdit(row)} title="Bewerk">
           <Pencil size={18} />
         </button>
-        <button
-          onClick={() => alert(`Verwijder ${row.name}`)}
-          className="hover:text-stone-700"
-          title="Verwijder"
-        >
+        <button onClick={() => onDelete(row)} title="Verwijder">
           <Trash2 size={18} />
         </button>
       </div>
     ),
-  }
-];
+  },
+]
 
 type Checked = DropdownMenuCheckboxItemProps["checked"]
 
@@ -93,17 +55,43 @@ const Expenses: React.FC = () => {
     const [showStatusBar, setShowStatusBar] = React.useState<Checked>(true)
     const [showActivityBar, setShowActivityBar] = React.useState<Checked>(false)
     const [showPanel, setShowPanel] = React.useState<Checked>(false)
+    const [expenses, setExpenses] = React.useState<ExpenseRow[]>([])
+    
+      const [dialogOpen, setDialogOpen] = React.useState(false)
+      const [newExpense, setNewExpense] = React.useState<ExpenseRow>({
+        name: "",
+        amount: 0,
+        date: "",
+        category: "",
+      })
+    
+      const totalAmount = expenses.reduce((sum, item) => {
+        const value = item.amount || 0;
+        return sum + value;
+      }, 0);
+    
+      const handleAddExpense = () => {
+        setExpenses([...expenses, newExpense])
+        setNewExpense({ name: "", amount: 0, date: "", category: "" })
+        setDialogOpen(false)
+      }
+    
+      const formattedTotal = totalAmount.toLocaleString("nl-NL", {
+        style: "currency",
+        currency: "EUR"
+      })
+
   return (
     <PageLayout title="Uitgaven"> 
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 place-items-center pb-12">
         <OverviewCard
           title="Aantal uitgeefposten"
-          amount="12" 
+          amount={expenses.length.toString()} 
         />
         <OverviewCard
-          title="Aatanl inkomen in €"
-          amount="€ 1.120,00"
-          amountColor="text-green-500"
+          title="Aatanl uitgaven in €"
+          amount={formattedTotal}
+          amountColor="text-red-500"
         />
       </div>
 
@@ -193,13 +181,53 @@ const Expenses: React.FC = () => {
         </div>
       </div>
 
-      <BaseTable columns={expenseColumns} data={ExpenseData} />
+      <BaseTable
+        columns={expenseColumns(
+          (row) => alert(`Bewerk ${row.name}`),
+          (row) => setExpenses(expenses.filter((item) => item !== row))
+        )}
+        data={expenses}
+      />
 
       <div className="fixed bottom-6 right-6 z-50">
-        <Button className="rounded-full w-12 h-12 p-0 shadow-lg" title="Toevoegen">
-          <Plus className="w-6 h-6" />
-        </Button>
+        <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+          <DialogTrigger asChild>
+            <Button className="rounded-full w-12 h-12 p-0 shadow-lg" title="Toevoegen">
+              <Plus className="w-6 h-6" />
+            </Button>
+          </DialogTrigger>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Nieuwe uitgave toevoegen</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-3">
+              <Input
+                placeholder="Naam"
+                value={newExpense.name}
+                onChange={(e) => setNewExpense({ ...newExpense, name: e.target.value })}
+              />
+              <Input
+                placeholder="Bedrag (€)"
+                value={newExpense.amount}
+                onChange={(e) => setNewExpense({ ...newExpense, amount: Number(e.target.value) })}
+              />
+              <Input
+                placeholder="Datum (YYYY-MM-DD)"
+                type="date"
+                value={newExpense.date}
+                onChange={(e) => setNewExpense({ ...newExpense, date: e.target.value })}
+              />
+              <Input
+                placeholder="Categorie"
+                value={newExpense.category}
+                onChange={(e) => setNewExpense({ ...newExpense, category: e.target.value })}
+              />
+              <Button onClick={handleAddExpense} className="w-full">Toevoegen</Button>
+            </div>
+          </DialogContent>
+        </Dialog>
       </div>
+
     </PageLayout>
   );
 };
