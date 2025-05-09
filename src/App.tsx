@@ -9,6 +9,7 @@ import Expenses from "./pages/Expenses";
 import Income from "./pages/Income";
 import Settings from "./pages/Settings";
 import Subscriptions from "./pages/Subscriptions";
+import Savings from "./pages/Savings";
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
           <Route path="expenses" element={<Expenses />} />
           <Route path="income" element={<Income />} />
           <Route path="vastelasten" element={<Subscriptions />} />
+          <Route path="spaarpotjes" element={<Savings />} />
           <Route path="settings" element={<Settings />} />
           <Route path="*" element={<div>404 - Pagina niet gevonden</div>} />
         </Route>

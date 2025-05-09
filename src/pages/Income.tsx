@@ -2,10 +2,10 @@ import React from "react";
 import { BaseTable } from "@/components/BaseTable";
 import PageLayout from "@/components/PageLayout";
 import OverviewCard from "@/components/OverviewCard";
-import { Pencil, Plus, Trash2 } from "lucide-react"
+import { Pencil, Plus, Trash2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
-import { DropdownMenuCheckboxItemProps } from "@radix-ui/react-dropdown-menu"
-import { Button } from "@/components/ui/button"
+import { DropdownMenuCheckboxItemProps } from "@radix-ui/react-dropdown-menu";
+import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuItem,
@@ -14,23 +14,35 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+} from "@/components/ui/dropdown-menu";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { useIncomeStore, IncomeRow } from "@/stores/incomeStore";
 
-type IncomeRow = {
-  name: string;
-  amount: number;
-  date: string;  
-  category: string;
-}
-
-const incomeColumns = (onEdit: (row: IncomeRow) => void, onDelete: (row: IncomeRow) => void) => [
+const incomeColumns = (
+  onEdit: (row: IncomeRow) => void,
+  onDelete: (row: IncomeRow) => void
+) => [
   { header: "Naam", key: "name" as const },
-  { header: "Bedrag", key: "amount" as keyof IncomeRow, render: (value: string | number) => new Intl.NumberFormat("nl-NL", { style: "currency", currency: "EUR",}).format(Number(value)), },
+  {
+    header: "Bedrag",
+    key: "amount" as keyof IncomeRow,
+    render: (value: string | number) =>
+      new Intl.NumberFormat("nl-NL", {
+        style: "currency",
+        currency: "EUR",
+      }).format(Number(value)),
+  },
   {
     header: "Datum",
     key: "date" as const,
-    render: (value: string | number) => new Date(String(value)).toLocaleDateString("nl-NL"),
+    render: (value: string | number) =>
+      new Date(String(value)).toLocaleDateString("nl-NL"),
   },
   { header: "Categorie", key: "category" as const },
   {
@@ -47,41 +59,40 @@ const incomeColumns = (onEdit: (row: IncomeRow) => void, onDelete: (row: IncomeR
       </div>
     ),
   },
-]
+];
 
-type Checked = DropdownMenuCheckboxItemProps["checked"]
+type Checked = DropdownMenuCheckboxItemProps["checked"];
 
 const Income: React.FC = () => {
-  const [showStatusBar, setShowStatusBar] = React.useState<Checked>(true)
-  const [showActivityBar, setShowActivityBar] = React.useState<Checked>(false)
-  const [showPanel, setShowPanel] = React.useState<Checked>(false)
-  const [incomes, setIncomes] = React.useState<IncomeRow[]>([])
+  // Zustand hooks
+  const incomes = useIncomeStore((state) => state.incomes);
+  const addIncome = useIncomeStore((state) => state.addIncome);
+  const removeIncome = useIncomeStore((state) => state.removeIncome);
 
-  const [dialogOpen, setDialogOpen] = React.useState(false)
+  // UI state
+  const [showStatusBar, setShowStatusBar] = React.useState<Checked>(true);
+  const [showActivityBar, setShowActivityBar] = React.useState<Checked>(false);
+  const [showPanel, setShowPanel] = React.useState<Checked>(false);
+  const [dialogOpen, setDialogOpen] = React.useState(false);
   const [newIncome, setNewIncome] = React.useState<IncomeRow>({
     name: "",
     amount: 0,
     date: "",
     category: "",
-  })
+  });
 
-  const totalAmount = incomes.reduce((sum, item) => {
-    const value = item.amount || 0;
-    return sum + value;
-  }, 0);
-
+  // Handlers
   const handleAddIncome = () => {
-    setIncomes([...incomes, newIncome])
-    setNewIncome({ name: "", amount: 0, date: "", category: "" })
-    setDialogOpen(false)
-  }
+    addIncome(newIncome);
+    setNewIncome({ name: "", amount: 0, date: "", category: "" });
+    setDialogOpen(false);
+  };
 
+  const totalAmount = incomes.reduce((sum, item) => sum + item.amount, 0);
   const formattedTotal = totalAmount.toLocaleString("nl-NL", {
     style: "currency",
-    currency: "EUR"
-  })
-  
-  
+    currency: "EUR",
+  });
 
   return (
     <PageLayout title="Inkomen">
@@ -91,45 +102,44 @@ const Income: React.FC = () => {
           amount={incomes.length.toString()}
         />
         <OverviewCard
-          title="Aatanl inkomen in €"
+          title="Aantal inkomen in €"
           amount={formattedTotal}
           amountColor="text-green-500"
         />
       </div>
 
       <div className="flex flex-wrap items-center justify-between gap-4 pb-4">
-        <div className="flex items-center gap-2"> {/* Links */}
-        <Input type="text" placeholder="Zoek op naam" className="w-64" />
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline">Categorie</Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent className="w-56">
-            {/* <Input type="text" placeholder="Zoek op naam" className="" /> */}
-            <DropdownMenuSeparator />
-            <DropdownMenuCheckboxItem
-              checked={showStatusBar}
-              onCheckedChange={setShowStatusBar}
-            >
-              Salaris
-            </DropdownMenuCheckboxItem>
-            <DropdownMenuCheckboxItem
-              checked={showActivityBar}
-              onCheckedChange={setShowActivityBar}
-            >
-              Zakgeld
-            </DropdownMenuCheckboxItem>
-            <DropdownMenuCheckboxItem
-              checked={showPanel}
-              onCheckedChange={setShowPanel}
-            >
-              Anders
-            </DropdownMenuCheckboxItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <div className="flex items-center gap-2">
+          <Input type="text" placeholder="Zoek op naam" className="w-64" />
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline">Categorie</Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="w-56">
+              <DropdownMenuSeparator />
+              <DropdownMenuCheckboxItem
+                checked={showStatusBar}
+                onCheckedChange={setShowStatusBar}
+              >
+                Salaris
+              </DropdownMenuCheckboxItem>
+              <DropdownMenuCheckboxItem
+                checked={showActivityBar}
+                onCheckedChange={setShowActivityBar}
+              >
+                Zakgeld
+              </DropdownMenuCheckboxItem>
+              <DropdownMenuCheckboxItem
+                checked={showPanel}
+                onCheckedChange={setShowPanel}
+              >
+                Anders
+              </DropdownMenuCheckboxItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
 
-        <div className="flex items-center gap-2"> {/* Rechts */}
+        <div className="flex items-center gap-2">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="outline" size="sm">
@@ -151,7 +161,7 @@ const Income: React.FC = () => {
               <Button variant="outline">Open</Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-56">
-              <DropdownMenuLabel>Appearance</DropdownMenuLabel>
+              <DropdownMenuLabel>Weergave</DropdownMenuLabel>
               <DropdownMenuSeparator />
               <DropdownMenuCheckboxItem
                 checked={showStatusBar}
@@ -177,7 +187,6 @@ const Income: React.FC = () => {
               >
                 Categorie
               </DropdownMenuCheckboxItem>
-              
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
@@ -186,7 +195,7 @@ const Income: React.FC = () => {
       <BaseTable
         columns={incomeColumns(
           (row) => alert(`Bewerk ${row.name}`),
-          (row) => setIncomes(incomes.filter((item) => item !== row))
+          (row) => removeIncome(row)
         )}
         data={incomes}
       />
@@ -194,7 +203,10 @@ const Income: React.FC = () => {
       <div className="fixed bottom-6 right-6 z-50">
         <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
           <DialogTrigger asChild>
-            <Button className="rounded-full w-12 h-12 p-0 shadow-lg" title="Toevoegen">
+            <Button
+              className="rounded-full w-12 h-12 p-0 shadow-lg"
+              title="Toevoegen"
+            >
               <Plus className="w-6 h-6" />
             </Button>
           </DialogTrigger>
@@ -206,30 +218,42 @@ const Income: React.FC = () => {
               <Input
                 placeholder="Naam"
                 value={newIncome.name}
-                onChange={(e) => setNewIncome({ ...newIncome, name: e.target.value })}
+                onChange={(e) =>
+                  setNewIncome({ ...newIncome, name: e.target.value })
+                }
               />
               <Input
                 placeholder="Bedrag (€)"
                 value={newIncome.amount}
-                onChange={(e) => setNewIncome({ ...newIncome, amount: Number(e.target.value) })}
+                onChange={(e) =>
+                  setNewIncome({
+                    ...newIncome,
+                    amount: Number(e.target.value),
+                  })
+                }
               />
               <Input
                 placeholder="Datum (YYYY-MM-DD)"
                 type="date"
                 value={newIncome.date}
-                onChange={(e) => setNewIncome({ ...newIncome, date: e.target.value })}
+                onChange={(e) =>
+                  setNewIncome({ ...newIncome, date: e.target.value })
+                }
               />
               <Input
                 placeholder="Categorie"
                 value={newIncome.category}
-                onChange={(e) => setNewIncome({ ...newIncome, category: e.target.value })}
+                onChange={(e) =>
+                  setNewIncome({ ...newIncome, category: e.target.value })
+                }
               />
-              <Button onClick={handleAddIncome} className="w-full">Toevoegen</Button>
+              <Button onClick={handleAddIncome} className="w-full">
+                Toevoegen
+              </Button>
             </div>
           </DialogContent>
         </Dialog>
       </div>
-
     </PageLayout>
   );
 };

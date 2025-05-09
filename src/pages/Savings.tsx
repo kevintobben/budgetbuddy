@@ -17,36 +17,36 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 
-type SubscriptionRow = {
+type SavingRow = {
   name: string;
   amount: number;
   date: string;  
   category: string;
 }
 
-const subscriptionsColumns = (onEdit: (row: SubscriptionRow) => void, onDelete: (row: SubscriptionRow) => void) => [
+const savingsColumns = (onEdit: (row: SavingRow) => void, onDelete: (row: SavingRow) => void) => [
   {
     header: "Naam",
-    key: "name" as keyof SubscriptionRow,
+    key: "name" as keyof SavingRow,
   },
   {
     header: "Bedrag",
-    key: "amount" as keyof SubscriptionRow,
+    key: "amount" as keyof SavingRow,
     render: (value: string | number) => value.toString(),
   },
   {
     header: "Datum",
-    key: "date" as keyof SubscriptionRow,
+    key: "date" as keyof SavingRow,
     render: (value: string | number) => new Date(value.toString()).toLocaleDateString(),
   },
   {
     header: "Categorie",
-    key: "category" as keyof SubscriptionRow,
+    key: "category" as keyof SavingRow,
   },
   {
     header: "Acties",
     key: "name" as const,
-    render: (_: unknown, row: SubscriptionRow) => (
+    render: (_: unknown, row: SavingRow) => (
       <div className="flex gap-2">
         <button onClick={() => onEdit(row)} title="Bewerk">
           <Pencil size={18} />
@@ -61,28 +61,28 @@ const subscriptionsColumns = (onEdit: (row: SubscriptionRow) => void, onDelete: 
 
 type Checked = DropdownMenuCheckboxItemProps["checked"]
 
-const Subscriptions: React.FC = () => {
+const Savings: React.FC = () => {
     const [showStatusBar, setShowStatusBar] = React.useState<Checked>(true)
     const [showActivityBar, setShowActivityBar] = React.useState<Checked>(false)
     const [showPanel, setShowPanel] = React.useState<Checked>(false)
-    const [subscriptions, setSubscriptions] = React.useState<SubscriptionRow[]>([])
+    const [savings, setSavings] = React.useState<SavingRow[]>([])
   
     const [dialogOpen, setDialogOpen] = React.useState(false)
-    const [newSubscription, setNewSubscription] = React.useState<SubscriptionRow>({
+    const [newSaving, setNewSaving] = React.useState<SavingRow>({
       name: "",
       amount: 0,
       date: "",
       category: "",
     })
   
-    const totalAmount = subscriptions.reduce((sum, item) => {
+    const totalAmount = savings.reduce((sum, item) => {
       const value = item.amount || 0;
       return sum + value;
     }, 0);
   
-    const handleAddSubscription = () => {
-      setSubscriptions([...subscriptions, newSubscription])
-      setNewSubscription({ name: "", amount: 0, date: "", category: "" })
+    const handleAddSaving = () => {
+      setSavings([...savings, newSaving])
+      setNewSaving({ name: "", amount: 0, date: "", category: "" })
       setDialogOpen(false)
     }
   
@@ -92,14 +92,14 @@ const Subscriptions: React.FC = () => {
     })  
 
   return (
-    <PageLayout title="Vaste lasten">
+    <PageLayout title="Spaarpotjes">
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 place-items-center pb-12">
         <OverviewCard
-          title="Aantal vaste lasten"
-          amount={subscriptions.length.toString()} 
+          title="Aantal spaarpotjes"
+          amount={savings.length.toString()} 
         />
         <OverviewCard
-          title="Totaal per maand €"
+          title="Totaal spaargeld €"
           amount={formattedTotal}
         />
       </div>
@@ -191,11 +191,11 @@ const Subscriptions: React.FC = () => {
       </div>
 
       <BaseTable
-        columns={subscriptionsColumns(
+        columns={savingsColumns(
           (row) => alert(`Bewerk ${row.name}`),
-          (row) => setSubscriptions(subscriptions.filter((item) => item !== row))
+          (row) => setSavings(savings.filter((item) => item !== row))
         )}
-        data={subscriptions}
+        data={savings}
       />
 
       <div className="fixed bottom-6 right-6 z-50">
@@ -212,26 +212,26 @@ const Subscriptions: React.FC = () => {
             <div className="space-y-3">
               <Input
                 placeholder="Naam"
-                value={newSubscription.name}
-                onChange={(e) => setNewSubscription({ ...newSubscription, name: e.target.value })}
+                value={newSaving.name}
+                onChange={(e) => setNewSaving({ ...newSaving, name: e.target.value })}
               />
               <Input
                 placeholder="Bedrag (€)"
-                value={newSubscription.amount}
-                onChange={(e) => setNewSubscription({ ...newSubscription, amount: Number(e.target.value) })}
+                value={newSaving.amount}
+                onChange={(e) => setNewSaving({ ...newSaving, amount: Number(e.target.value) })}
               />
               <Input
                 placeholder="Datum (YYYY-MM-DD)"
                 type="date"
-                value={newSubscription.date}
-                onChange={(e) => setNewSubscription({ ...newSubscription, date: e.target.value })}
+                value={newSaving.date}
+                onChange={(e) => setNewSaving({ ...newSaving, date: e.target.value })}
               />
               <Input
                 placeholder="Categorie"
-                value={newSubscription.category}
-                onChange={(e) => setNewSubscription({ ...newSubscription, category: e.target.value })}
+                value={newSaving.category}
+                onChange={(e) => setNewSaving({ ...newSaving, category: e.target.value })}
               />
-              <Button onClick={handleAddSubscription} className="w-full">Toevoegen</Button>
+              <Button onClick={handleAddSaving} className="w-full">Toevoegen</Button>
             </div>
           </DialogContent>
         </Dialog>
@@ -241,4 +241,4 @@ const Subscriptions: React.FC = () => {
   );
 };
 
-export default Subscriptions;
+export default Savings;

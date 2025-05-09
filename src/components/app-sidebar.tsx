@@ -4,6 +4,7 @@ import {
   WalletCards,
   BanknoteArrowUp,
   Settings,
+  PiggyBank,
 } from "lucide-react"
 import { NavLink } from "react-router-dom"
 
@@ -21,17 +22,17 @@ import {
 // Sidebar menu items
 const items = [
   {
-    title: "Home",
+    title: "Overzicht",
     to: "/",
     icon: HomeIcon,
   },
   {
-    title: "Income",
+    title: "Inkomen",
     to: "/income",
     icon: BanknoteArrowUp,
   },
   {
-    title: "Expenses",
+    title: "Uitgaven",
     to: "/expenses",
     icon: BanknoteArrowDown,
   },
@@ -41,7 +42,12 @@ const items = [
     icon: WalletCards,
   },
   {
-    title: "Settings",
+    title: "Spaarpotjes",
+    to: "/spaarpotjes",
+    icon: PiggyBank,
+  },
+  {
+    title: "Instellingen",
     to: "/settings",
     icon: Settings,
   },
