@@ -16,37 +16,33 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { useSavingsStore, SavingsRow } from "@/stores/savingsStore";
 
-type SavingRow = {
-  name: string;
-  amount: number;
-  date: string;  
-  category: string;
-}
-
-const savingsColumns = (onEdit: (row: SavingRow) => void, onDelete: (row: SavingRow) => void) => [
-  {
-    header: "Naam",
-    key: "name" as keyof SavingRow,
-  },
+const savingsColumns = (
+  onEdit: (row: SavingsRow) => void,
+  onDelete: (row: SavingsRow) => void
+) => [
+  { header: "Naam", key: "name" as const },
   {
     header: "Bedrag",
-    key: "amount" as keyof SavingRow,
-    render: (value: string | number) => value.toString(),
+    key: "amount" as keyof SavingsRow,
+    render: (value: string | number) =>
+      new Intl.NumberFormat("nl-NL", {
+        style: "currency",
+        currency: "EUR",
+      }).format(Number(value)),
   },
   {
     header: "Datum",
-    key: "date" as keyof SavingRow,
-    render: (value: string | number) => new Date(value.toString()).toLocaleDateString(),
+    key: "date" as const,
+    render: (value: string | number) =>
+      new Date(String(value)).toLocaleDateString("nl-NL"),
   },
-  {
-    header: "Categorie",
-    key: "category" as keyof SavingRow,
-  },
+  { header: "Categorie", key: "category" as const },
   {
     header: "Acties",
     key: "name" as const,
-    render: (_: unknown, row: SavingRow) => (
+    render: (_: unknown, row: SavingsRow) => (
       <div className="flex gap-2">
         <button onClick={() => onEdit(row)} title="Bewerk">
           <Pencil size={18} />
@@ -62,34 +58,35 @@ const savingsColumns = (onEdit: (row: SavingRow) => void, onDelete: (row: Saving
 type Checked = DropdownMenuCheckboxItemProps["checked"]
 
 const Savings: React.FC = () => {
-    const [showStatusBar, setShowStatusBar] = React.useState<Checked>(true)
-    const [showActivityBar, setShowActivityBar] = React.useState<Checked>(false)
-    const [showPanel, setShowPanel] = React.useState<Checked>(false)
-    const [savings, setSavings] = React.useState<SavingRow[]>([])
-  
-    const [dialogOpen, setDialogOpen] = React.useState(false)
-    const [newSaving, setNewSaving] = React.useState<SavingRow>({
-      name: "",
-      amount: 0,
-      date: "",
-      category: "",
-    })
-  
-    const totalAmount = savings.reduce((sum, item) => {
-      const value = item.amount || 0;
-      return sum + value;
-    }, 0);
-  
-    const handleAddSaving = () => {
-      setSavings([...savings, newSaving])
-      setNewSaving({ name: "", amount: 0, date: "", category: "" })
-      setDialogOpen(false)
-    }
-  
+  // Zustand hooks
+  const savings = useSavingsStore((state) => state.savings);
+  const addSavings = useSavingsStore((state) => state.addSavings);
+  const removeSavings = useSavingsStore((state) => state.removeSavings);
+
+  // UI state
+  const [showStatusBar, setShowStatusBar] = React.useState<Checked>(true);
+  const [showActivityBar, setShowActivityBar] = React.useState<Checked>(false);
+  const [showPanel, setShowPanel] = React.useState<Checked>(false);
+  const [dialogOpen, setDialogOpen] = React.useState(false);
+  const [newSavings, setNewSavings] = React.useState<SavingsRow>({
+    name: "",
+    amount: 0,
+    date: "",
+    category: "",
+  });
+
+  // Handlers
+  const handleAddSavings = () => {
+    addSavings(newSavings);
+    setNewSavings({ name: "", amount: 0, date: "", category: "" });
+    setDialogOpen(false);
+  };
+
+  const totalAmount = savings.reduce((sum, item) => sum + item.amount, 0);
     const formattedTotal = totalAmount.toLocaleString("nl-NL", {
       style: "currency",
-      currency: "EUR"
-    })  
+      currency: "EUR",
+  });
 
   return (
     <PageLayout title="Spaarpotjes">
@@ -190,10 +187,10 @@ const Savings: React.FC = () => {
         </div>
       </div>
 
-      <BaseTable
+<BaseTable
         columns={savingsColumns(
           (row) => alert(`Bewerk ${row.name}`),
-          (row) => setSavings(savings.filter((item) => item !== row))
+          (row) => removeSavings(row)
         )}
         data={savings}
       />
@@ -201,42 +198,57 @@ const Savings: React.FC = () => {
       <div className="fixed bottom-6 right-6 z-50">
         <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
           <DialogTrigger asChild>
-            <Button className="rounded-full w-12 h-12 p-0 shadow-lg" title="Toevoegen">
+            <Button
+              className="rounded-full w-12 h-12 p-0 shadow-lg"
+              title="Toevoegen"
+            >
               <Plus className="w-6 h-6" />
             </Button>
           </DialogTrigger>
           <DialogContent>
             <DialogHeader>
-              <DialogTitle>Nieuwe uitgave toevoegen</DialogTitle>
+              <DialogTitle>Nieuw spaargeld toevoegen</DialogTitle>
             </DialogHeader>
             <div className="space-y-3">
               <Input
                 placeholder="Naam"
-                value={newSaving.name}
-                onChange={(e) => setNewSaving({ ...newSaving, name: e.target.value })}
+                value={newSavings.name}
+                onChange={(e) =>
+                  setNewSavings({ ...newSavings, name: e.target.value })
+                }
               />
               <Input
                 placeholder="Bedrag (€)"
-                value={newSaving.amount}
-                onChange={(e) => setNewSaving({ ...newSaving, amount: Number(e.target.value) })}
+                value={newSavings.amount}
+                onChange={(e) =>
+                  setNewSavings({
+                    ...newSavings,
+                    amount: Number(e.target.value),
+                  })
+                }
               />
               <Input
                 placeholder="Datum (YYYY-MM-DD)"
                 type="date"
-                value={newSaving.date}
-                onChange={(e) => setNewSaving({ ...newSaving, date: e.target.value })}
+                value={newSavings.date}
+                onChange={(e) =>
+                  setNewSavings({ ...newSavings, date: e.target.value })
+                }
               />
               <Input
                 placeholder="Categorie"
-                value={newSaving.category}
-                onChange={(e) => setNewSaving({ ...newSaving, category: e.target.value })}
+                value={newSavings.category}
+                onChange={(e) =>
+                  setNewSavings({ ...newSavings, category: e.target.value })
+                }
               />
-              <Button onClick={handleAddSaving} className="w-full">Toevoegen</Button>
+              <Button onClick={handleAddSavings} className="w-full">
+                Toevoegen
+              </Button>
             </div>
           </DialogContent>
         </Dialog>
       </div>
-      
     </PageLayout>
   );
 };

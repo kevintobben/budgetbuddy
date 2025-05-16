@@ -16,37 +16,33 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { useSubscriptionsStore, SubscriptionsRow } from "@/stores/subscriptionsStore";
 
-type SubscriptionRow = {
-  name: string;
-  amount: number;
-  date: string;  
-  category: string;
-}
-
-const subscriptionsColumns = (onEdit: (row: SubscriptionRow) => void, onDelete: (row: SubscriptionRow) => void) => [
-  {
-    header: "Naam",
-    key: "name" as keyof SubscriptionRow,
-  },
+const subscriptionColumns = (
+  onEdit: (row: SubscriptionsRow) => void,
+  onDelete: (row: SubscriptionsRow) => void
+) => [
+  { header: "Naam", key: "name" as const },
   {
     header: "Bedrag",
-    key: "amount" as keyof SubscriptionRow,
-    render: (value: string | number) => value.toString(),
+    key: "amount" as keyof SubscriptionsRow,
+    render: (value: string | number) =>
+      new Intl.NumberFormat("nl-NL", {
+        style: "currency",
+        currency: "EUR",
+      }).format(Number(value)),
   },
   {
     header: "Datum",
-    key: "date" as keyof SubscriptionRow,
-    render: (value: string | number) => new Date(value.toString()).toLocaleDateString(),
+    key: "date" as const,
+    render: (value: string | number) =>
+      new Date(String(value)).toLocaleDateString("nl-NL"),
   },
-  {
-    header: "Categorie",
-    key: "category" as keyof SubscriptionRow,
-  },
+  { header: "Categorie", key: "category" as const },
   {
     header: "Acties",
     key: "name" as const,
-    render: (_: unknown, row: SubscriptionRow) => (
+    render: (_: unknown, row: SubscriptionsRow) => (
       <div className="flex gap-2">
         <button onClick={() => onEdit(row)} title="Bewerk">
           <Pencil size={18} />
@@ -62,34 +58,35 @@ const subscriptionsColumns = (onEdit: (row: SubscriptionRow) => void, onDelete: 
 type Checked = DropdownMenuCheckboxItemProps["checked"]
 
 const Subscriptions: React.FC = () => {
-    const [showStatusBar, setShowStatusBar] = React.useState<Checked>(true)
-    const [showActivityBar, setShowActivityBar] = React.useState<Checked>(false)
-    const [showPanel, setShowPanel] = React.useState<Checked>(false)
-    const [subscriptions, setSubscriptions] = React.useState<SubscriptionRow[]>([])
-  
-    const [dialogOpen, setDialogOpen] = React.useState(false)
-    const [newSubscription, setNewSubscription] = React.useState<SubscriptionRow>({
-      name: "",
-      amount: 0,
-      date: "",
-      category: "",
-    })
-  
-    const totalAmount = subscriptions.reduce((sum, item) => {
-      const value = item.amount || 0;
-      return sum + value;
-    }, 0);
-  
-    const handleAddSubscription = () => {
-      setSubscriptions([...subscriptions, newSubscription])
-      setNewSubscription({ name: "", amount: 0, date: "", category: "" })
-      setDialogOpen(false)
-    }
-  
+  // Zustand hooks
+  const subscriptions = useSubscriptionsStore((state) => state.subscriptions);
+  const addSubscription = useSubscriptionsStore((state) => state.addSubscription);
+  const removeSubscription = useSubscriptionsStore((state) => state.removeSubscription);
+
+  // UI state
+  const [showStatusBar, setShowStatusBar] = React.useState<Checked>(true);
+  const [showActivityBar, setShowActivityBar] = React.useState<Checked>(false);
+  const [showPanel, setShowPanel] = React.useState<Checked>(false);
+  const [dialogOpen, setDialogOpen] = React.useState(false);
+  const [newSubscription, setNewSubscription] = React.useState<SubscriptionsRow>({
+    name: "",
+    amount: 0,
+    date: "",
+    category: "",
+  });
+
+  // Handlers
+  const handleAddSubscription = () => {
+    addSubscription(newSubscription);
+    setNewSubscription({ name: "", amount: 0, date: "", category: "" });
+    setDialogOpen(false);
+  };
+
+  const totalAmount = subscriptions.reduce((sum, item) => sum + item.amount, 0);
     const formattedTotal = totalAmount.toLocaleString("nl-NL", {
       style: "currency",
-      currency: "EUR"
-    })  
+      currency: "EUR",
+  });
 
   return (
     <PageLayout title="Vaste lasten">
@@ -191,9 +188,9 @@ const Subscriptions: React.FC = () => {
       </div>
 
       <BaseTable
-        columns={subscriptionsColumns(
+        columns={subscriptionColumns(
           (row) => alert(`Bewerk ${row.name}`),
-          (row) => setSubscriptions(subscriptions.filter((item) => item !== row))
+          (row) => removeSubscription(row)
         )}
         data={subscriptions}
       />
@@ -201,42 +198,57 @@ const Subscriptions: React.FC = () => {
       <div className="fixed bottom-6 right-6 z-50">
         <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
           <DialogTrigger asChild>
-            <Button className="rounded-full w-12 h-12 p-0 shadow-lg" title="Toevoegen">
+            <Button
+              className="rounded-full w-12 h-12 p-0 shadow-lg"
+              title="Toevoegen"
+            >
               <Plus className="w-6 h-6" />
             </Button>
           </DialogTrigger>
           <DialogContent>
             <DialogHeader>
-              <DialogTitle>Nieuwe uitgave toevoegen</DialogTitle>
+              <DialogTitle>Nieuwe vaste last toevoegen</DialogTitle>
             </DialogHeader>
             <div className="space-y-3">
               <Input
                 placeholder="Naam"
                 value={newSubscription.name}
-                onChange={(e) => setNewSubscription({ ...newSubscription, name: e.target.value })}
+                onChange={(e) =>
+                  setNewSubscription({ ...newSubscription, name: e.target.value })
+                }
               />
               <Input
                 placeholder="Bedrag (€)"
                 value={newSubscription.amount}
-                onChange={(e) => setNewSubscription({ ...newSubscription, amount: Number(e.target.value) })}
+                onChange={(e) =>
+                  setNewSubscription({
+                    ...newSubscription,
+                    amount: Number(e.target.value),
+                  })
+                }
               />
               <Input
                 placeholder="Datum (YYYY-MM-DD)"
                 type="date"
                 value={newSubscription.date}
-                onChange={(e) => setNewSubscription({ ...newSubscription, date: e.target.value })}
+                onChange={(e) =>
+                  setNewSubscription({ ...newSubscription, date: e.target.value })
+                }
               />
               <Input
                 placeholder="Categorie"
                 value={newSubscription.category}
-                onChange={(e) => setNewSubscription({ ...newSubscription, category: e.target.value })}
+                onChange={(e) =>
+                  setNewSubscription({ ...newSubscription, category: e.target.value })
+                }
               />
-              <Button onClick={handleAddSubscription} className="w-full">Toevoegen</Button>
+              <Button onClick={handleAddSubscription} className="w-full">
+                Toevoegen
+              </Button>
             </div>
           </DialogContent>
         </Dialog>
       </div>
-      
     </PageLayout>
   );
 };
