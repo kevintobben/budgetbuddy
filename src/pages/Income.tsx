@@ -64,12 +64,10 @@ const incomeColumns = (
 type Checked = DropdownMenuCheckboxItemProps["checked"];
 
 const Income: React.FC = () => {
-  // Zustand hooks
   const incomes = useIncomeStore((state) => state.incomes);
   const addIncome = useIncomeStore((state) => state.addIncome);
   const removeIncome = useIncomeStore((state) => state.removeIncome);
 
-  // UI state
   const [showStatusBar, setShowStatusBar] = React.useState<Checked>(true);
   const [showActivityBar, setShowActivityBar] = React.useState<Checked>(false);
   const [showPanel, setShowPanel] = React.useState<Checked>(false);
@@ -81,7 +79,6 @@ const Income: React.FC = () => {
     category: "",
   });
 
-  // Handlers
   const handleAddIncome = () => {
     addIncome(newIncome);
     setNewIncome({ name: "", amount: 0, date: "", category: "" });

@@ -58,12 +58,10 @@ const expenseColumns = (
 type Checked = DropdownMenuCheckboxItemProps["checked"]
 
 const Expenses: React.FC = () => {
-  // Zustand hooks
   const expenses = useExpenseStore((state) => state.expenses);
   const addExpense = useExpenseStore((state) => state.addExpense);
   const removeExpense = useExpenseStore((state) => state.removeExpense);
 
-  // UI state
   const [showStatusBar, setShowStatusBar] = React.useState<Checked>(true);
   const [showActivityBar, setShowActivityBar] = React.useState<Checked>(false);
   const [showPanel, setShowPanel] = React.useState<Checked>(false);
@@ -75,7 +73,6 @@ const Expenses: React.FC = () => {
     category: "",
   });
 
-  // Handlers
   const handleAddExpense = () => {
     addExpense(newExpense);
     setNewExpense({ name: "", amount: 0, date: "", category: "" });

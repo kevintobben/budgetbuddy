@@ -58,12 +58,10 @@ const subscriptionColumns = (
 type Checked = DropdownMenuCheckboxItemProps["checked"]
 
 const Subscriptions: React.FC = () => {
-  // Zustand hooks
   const subscriptions = useSubscriptionsStore((state) => state.subscriptions);
   const addSubscription = useSubscriptionsStore((state) => state.addSubscription);
   const removeSubscription = useSubscriptionsStore((state) => state.removeSubscription);
 
-  // UI state
   const [showStatusBar, setShowStatusBar] = React.useState<Checked>(true);
   const [showActivityBar, setShowActivityBar] = React.useState<Checked>(false);
   const [showPanel, setShowPanel] = React.useState<Checked>(false);
@@ -75,7 +73,6 @@ const Subscriptions: React.FC = () => {
     category: "",
   });
 
-  // Handlers
   const handleAddSubscription = () => {
     addSubscription(newSubscription);
     setNewSubscription({ name: "", amount: 0, date: "", category: "" });

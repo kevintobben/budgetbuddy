@@ -58,12 +58,10 @@ const savingsColumns = (
 type Checked = DropdownMenuCheckboxItemProps["checked"]
 
 const Savings: React.FC = () => {
-  // Zustand hooks
   const savings = useSavingsStore((state) => state.savings);
   const addSavings = useSavingsStore((state) => state.addSavings);
   const removeSavings = useSavingsStore((state) => state.removeSavings);
 
-  // UI state
   const [showStatusBar, setShowStatusBar] = React.useState<Checked>(true);
   const [showActivityBar, setShowActivityBar] = React.useState<Checked>(false);
   const [showPanel, setShowPanel] = React.useState<Checked>(false);
@@ -75,7 +73,6 @@ const Savings: React.FC = () => {
     category: "",
   });
 
-  // Handlers
   const handleAddSavings = () => {
     addSavings(newSavings);
     setNewSavings({ name: "", amount: 0, date: "", category: "" });
