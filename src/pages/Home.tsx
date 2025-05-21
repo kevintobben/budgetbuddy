@@ -23,12 +23,12 @@ const Home: React.FC = () => {
 
   return (
     <PageLayout title="Overzicht" showDateFilters>
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 place-items-center">
+      <div className="grid grid-cols-1 md:grid-cols-3 xl:grid-cols-5 gap-8 px-4 place-items-stretch">
         <OverviewCard title="Geld over deze maand" amount={format(leftThisMonth)} />
-        <OverviewCard title="Inkomen" amount={format(totalIncome)} />
-        <OverviewCard title="Uitgaven" amount={format(totalExpenses)} />
-        <OverviewCard title="Vaste lasten" amount={format(totalSubscriptions)} />
-        <OverviewCard title="Spaarpotjes" amount={format(totalSavings)} />
+        <OverviewCard title="Inkomen" amount={format(totalIncome)} amountColor="text-green-500" />
+        <OverviewCard title="Uitgaven" amount={format(totalExpenses)} amountColor="text-red-500" />
+        <OverviewCard title="Vaste lasten" amount={format(totalSubscriptions)} amountColor="text-blue-500" />
+        <OverviewCard title="Spaarpotjes" amount={format(totalSavings)}  amountColor="text-orange-500"/>
       </div>
     </PageLayout>
   );

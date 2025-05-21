@@ -18,7 +18,7 @@ const OverviewCard: React.FC<OverviewCardProps> = ({
   amountColor = "text-black",
 }) => {
   return (
-    <Card className="w-[250px]">
+    <Card className="w-[225px]">
       <CardHeader>
         <CardTitle>{title}</CardTitle>
       </CardHeader>
