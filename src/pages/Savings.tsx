@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { useSavingsStore, SavingsRow } from "@/stores/savingsStore";
+import SavingsCard from "@/components/SavingsCard";
 
 const savingsColumns = (
   onEdit: (row: SavingsRow) => void,
@@ -184,7 +185,14 @@ const Savings: React.FC = () => {
         </div>
       </div>
 
-<BaseTable
+      <div className="grid grid-cols-1 md:grid-cols-3 xl:grid-cols-5 gap-8 px-4 pb-6 place-items-stretch">      
+        <SavingsCard title="Vrij spaargeld" amount={formattedTotal} />
+        <SavingsCard title="Kamer/ PC" amount={formattedTotal} />
+        <SavingsCard title="Toekomst" amount={formattedTotal} />
+        <SavingsCard title="Ooglaseren" amount={formattedTotal} />
+      </div>
+
+      <BaseTable
         columns={savingsColumns(
           (row) => alert(`Bewerk ${row.name}`),
           (row) => removeSavings(row)
