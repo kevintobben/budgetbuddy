@@ -19,7 +19,7 @@ function App() {
           <Route path="expenses" element={<Expenses />} />
           <Route path="income" element={<Income />} />
           <Route path="vastelasten" element={<Subscriptions />} />
-          <Route path="spaarpotjes" element={<Savings />} />
+          <Route path="spaargeld" element={<Savings />} />
           <Route path="settings" element={<Settings />} />
           <Route path="*" element={<div>404 - Pagina niet gevonden</div>} />
         </Route>

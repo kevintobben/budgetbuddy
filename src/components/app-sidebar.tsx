@@ -42,8 +42,8 @@ const items = [
     icon: WalletCards,
   },
   {
-    title: "Spaarpotjes",
-    to: "/spaarpotjes",
+    title: "Spaargeld",
+    to: "/spaargeld",
     icon: PiggyBank,
   },
   {
