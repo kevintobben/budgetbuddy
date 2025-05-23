@@ -5,30 +5,43 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress"
-
+import { Progress } from "@/components/ui/progress";
+import { Trash2, Pencil } from "lucide-react";
 
 interface SavingsCardProps {
   title: string;
-  amount: string;
-  amountColor?: string;
+  amount: number;
+  goal: number;
+  onDelete: () => void;
+  onEdit: () => void;
 }
 
 const SavingsCard: React.FC<SavingsCardProps> = ({
   title,
   amount,
-  amountColor = "text-black",
+  goal,
+  onDelete,
+  onEdit,
 }) => {
+  const percentage = Math.min(100, (amount / goal) * 100);
+
   return (
-    <Card className="w-[225px]">
-      <CardHeader>
-        <CardTitle>{title}</CardTitle>
+    <Card className="w-[225px] relative">
+      <CardHeader className="flex justify-between items-center">
+        <CardTitle className="text-sm">{title}</CardTitle>
+        <button onClick={onEdit} title="Bewerken">
+          <Pencil className="w-4 h-4 text-gray-500 hover:text-blue-500" />
+        </button>
+        <button onClick={onDelete} title="Verwijder">
+          <Trash2 className="w-4 h-4 text-gray-500 hover:text-red-500" />
+        </button>
       </CardHeader>
-      <CardContent>
-        <p className={`text-3xl font-semibold ${amountColor}`}>{amount}</p>
-      </CardContent>
-      <CardContent>
-        <Progress value={50} className="h-2" />
+      <CardContent className="space-y-2">
+        <p className="text-lg font-semibold text-black">
+          € {amount.toLocaleString("nl-NL")}
+        </p>
+        <p className="text-sm text-gray-500">Doel: € {goal.toLocaleString("nl-NL")}</p>
+        <Progress value={percentage} className="h-2" />
       </CardContent>
     </Card>
   );

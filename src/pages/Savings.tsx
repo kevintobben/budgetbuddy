@@ -1,8 +1,7 @@
 import React from "react";
-import { BaseTable } from "@/components/BaseTable";
 import PageLayout from "@/components/PageLayout";
 import OverviewCard from "@/components/OverviewCard";
-import { Pencil, Plus, Trash2 } from "lucide-react"
+import { Plus } from "lucide-react"
 import { Input } from "@/components/ui/input";
 import { DropdownMenuCheckboxItemProps } from "@radix-ui/react-dropdown-menu"
 import { Button } from "@/components/ui/button"
@@ -15,46 +14,10 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTrigger } from "@/components/ui/dialog";
 import { useSavingsStore, SavingsRow } from "@/stores/savingsStore";
 import SavingsCard from "@/components/SavingsCard";
 
-const savingsColumns = (
-  onEdit: (row: SavingsRow) => void,
-  onDelete: (row: SavingsRow) => void
-) => [
-  { header: "Naam", key: "name" as const },
-  {
-    header: "Bedrag",
-    key: "amount" as keyof SavingsRow,
-    render: (value: string | number) =>
-      new Intl.NumberFormat("nl-NL", {
-        style: "currency",
-        currency: "EUR",
-      }).format(Number(value)),
-  },
-  {
-    header: "Datum",
-    key: "date" as const,
-    render: (value: string | number) =>
-      new Date(String(value)).toLocaleDateString("nl-NL"),
-  },
-  { header: "Categorie", key: "category" as const },
-  {
-    header: "Acties",
-    key: "name" as const,
-    render: (_: unknown, row: SavingsRow) => (
-      <div className="flex gap-2">
-        <button onClick={() => onEdit(row)} title="Bewerk">
-          <Pencil size={18} />
-        </button>
-        <button onClick={() => onDelete(row)} title="Verwijder">
-          <Trash2 size={18} />
-        </button>
-      </div>
-    ),
-  },
-];
 
 type Checked = DropdownMenuCheckboxItemProps["checked"]
 
@@ -62,6 +25,8 @@ const Savings: React.FC = () => {
   const savings = useSavingsStore((state) => state.savings);
   const addSavings = useSavingsStore((state) => state.addSavings);
   const removeSavings = useSavingsStore((state) => state.removeSavings);
+  const [editingSavings, setEditingSavings] = React.useState<SavingsRow | null>(null);
+
 
   const [showStatusBar, setShowStatusBar] = React.useState<Checked>(true);
   const [showActivityBar, setShowActivityBar] = React.useState<Checked>(false);
@@ -74,11 +39,6 @@ const Savings: React.FC = () => {
     category: "",
   });
 
-  const handleAddSavings = () => {
-    addSavings(newSavings);
-    setNewSavings({ name: "", amount: 0, date: "", category: "" });
-    setDialogOpen(false);
-  };
 
   const totalAmount = savings.reduce((sum, item) => sum + item.amount, 0);
     const formattedTotal = totalAmount.toLocaleString("nl-NL", {
@@ -88,6 +48,7 @@ const Savings: React.FC = () => {
 
   return (
     <PageLayout title="Spaarpotjes">
+      {/* Cards bovenaan de pagina */}
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 place-items-center pb-12">
         <OverviewCard
           title="Aantal spaarpotjes"
@@ -99,6 +60,7 @@ const Savings: React.FC = () => {
         />
       </div>
 
+      {/* Filters en sortering */}
       <div className="flex flex-wrap items-center justify-between gap-4 pb-4">
         <div className="flex items-center gap-2">
         <Input type="text" placeholder="Zoek op naam" className="w-64" />
@@ -185,21 +147,24 @@ const Savings: React.FC = () => {
         </div>
       </div>
 
+      {/* Spaargeld cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 xl:grid-cols-5 gap-8 px-4 pb-6 place-items-stretch">      
-        <SavingsCard title="Vrij spaargeld" amount={formattedTotal} />
-        <SavingsCard title="Kamer/ PC" amount={formattedTotal} />
-        <SavingsCard title="Toekomst" amount={formattedTotal} />
-        <SavingsCard title="Ooglaseren" amount={formattedTotal} />
+        {savings.map((savings) => (
+          <SavingsCard
+            key={savings.name}
+            title={savings.name}
+            amount={savings.amount}
+            goal={savings.goal ?? 0}
+            onDelete={() => removeSavings(savings)}
+            onEdit={() => {
+              setEditingSavings(savings);
+              setDialogOpen(true);
+            }}
+          />
+        ))}
       </div>
 
-      <BaseTable
-        columns={savingsColumns(
-          (row) => alert(`Bewerk ${row.name}`),
-          (row) => removeSavings(row)
-        )}
-        data={savings}
-      />
-
+      {/* + button en de modal */}
       <div className="fixed bottom-6 right-6 z-50">
         <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
           <DialogTrigger asChild>
@@ -212,19 +177,36 @@ const Savings: React.FC = () => {
           </DialogTrigger>
           <DialogContent>
             <DialogHeader>
-              <DialogTitle>Nieuw spaargeld toevoegen</DialogTitle>
+              {editingSavings ? "Spaarpotje bewerken" : "Nieuw spaarpotje toevoegen"}
             </DialogHeader>
             <div className="space-y-3">
               <Input
+                placeholder="Edit"
+                value={editingSavings?.name ?? newSavings.name}
+                onChange={(e) =>
+                  editingSavings
+                    ? setEditingSavings({ ...editingSavings, name: e.target.value })
+                    : setNewSavings({ ...newSavings, name: e.target.value })
+                }
+              />              
+              <Input
                 placeholder="Naam"
-                value={newSavings.name}
+                value={editingSavings?.name ?? newSavings.name}
                 onChange={(e) =>
                   setNewSavings({ ...newSavings, name: e.target.value })
                 }
               />
               <Input
+                placeholder="Spaardoel (€)"
+                value={editingSavings?.goal ?? newSavings.goal}
+                onChange={(e) =>
+                  setNewSavings({ ...newSavings, goal: Number(e.target.value.replace(",", ".")) })
+                }
+              />
+
+              <Input
                 placeholder="Bedrag (€)"
-                value={newSavings.amount}
+                value={editingSavings?.amount ?? newSavings.amount}
                 onChange={(e) =>
                   setNewSavings({
                     ...newSavings,
@@ -235,20 +217,32 @@ const Savings: React.FC = () => {
               <Input
                 placeholder="Datum (YYYY-MM-DD)"
                 type="date"
-                value={newSavings.date}
+                value={editingSavings?.date ?? newSavings.date}
                 onChange={(e) =>
                   setNewSavings({ ...newSavings, date: e.target.value })
                 }
               />
               <Input
                 placeholder="Categorie"
-                value={newSavings.category}
+                value={editingSavings?.category ?? newSavings.category}
                 onChange={(e) =>
                   setNewSavings({ ...newSavings, category: e.target.value })
                 }
               />
-              <Button onClick={handleAddSavings} className="w-full">
-                Toevoegen
+              <Button
+                onClick={() => {
+                  if (editingSavings) {
+                    useSavingsStore.getState().updateSavings(editingSavings);
+                    setEditingSavings(null);
+                  } else {
+                    addSavings(newSavings);
+                    setNewSavings({ name: "", amount: 0, goal: 0, date: "", category: "" });
+                  }
+                  setDialogOpen(false);
+                }}
+                className="w-full"
+              >
+                {editingSavings ? "Opslaan" : "Toevoegen"}
               </Button>
             </div>
           </DialogContent>
