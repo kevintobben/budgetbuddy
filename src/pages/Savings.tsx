@@ -18,7 +18,6 @@ import { Dialog, DialogContent, DialogHeader, DialogTrigger } from "@/components
 import { useSavingsStore, SavingsRow } from "@/stores/savingsStore";
 import SavingsCard from "@/components/SavingsCard";
 
-
 type Checked = DropdownMenuCheckboxItemProps["checked"]
 
 const Savings: React.FC = () => {
@@ -26,7 +25,6 @@ const Savings: React.FC = () => {
   const addSavings = useSavingsStore((state) => state.addSavings);
   const removeSavings = useSavingsStore((state) => state.removeSavings);
   const [editingSavings, setEditingSavings] = React.useState<SavingsRow | null>(null);
-
 
   const [showStatusBar, setShowStatusBar] = React.useState<Checked>(true);
   const [showActivityBar, setShowActivityBar] = React.useState<Checked>(false);
@@ -38,7 +36,6 @@ const Savings: React.FC = () => {
     date: "",
     category: "",
   });
-
 
   const totalAmount = savings.reduce((sum, item) => sum + item.amount, 0);
     const formattedTotal = totalAmount.toLocaleString("nl-NL", {
@@ -171,63 +168,79 @@ const Savings: React.FC = () => {
             <Button
               className="rounded-full w-12 h-12 p-0 shadow-lg"
               title="Toevoegen"
+              onClick={() => {
+                setEditingSavings(null);
+                setNewSavings({ name: "", amount: 0, goal: 0, date: "", category: "" });
+              }}
             >
               <Plus className="w-6 h-6" />
             </Button>
           </DialogTrigger>
           <DialogContent>
             <DialogHeader>
-              {editingSavings ? "Spaarpotje bewerken" : "Nieuw spaarpotje toevoegen"}
+              {editingSavings ? "Spaarpot bewerken" : "Nieuwe spaarpot toevoegen"}
             </DialogHeader>
             <div className="space-y-3">
               <Input
-                placeholder="Edit"
-                value={editingSavings?.name ?? newSavings.name}
-                onChange={(e) =>
-                  editingSavings
-                    ? setEditingSavings({ ...editingSavings, name: e.target.value })
-                    : setNewSavings({ ...newSavings, name: e.target.value })
-                }
-              />              
-              <Input
                 placeholder="Naam"
-                value={editingSavings?.name ?? newSavings.name}
-                onChange={(e) =>
-                  setNewSavings({ ...newSavings, name: e.target.value })
-                }
+                value={editingSavings ? editingSavings.name : newSavings.name}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  if (editingSavings) {
+                    setEditingSavings({ ...editingSavings, name: value });
+                  } else {
+                    setNewSavings({ ...newSavings, name: value });
+                  }
+                }}
               />
               <Input
                 placeholder="Spaardoel (€)"
-                value={editingSavings?.goal ?? newSavings.goal}
-                onChange={(e) =>
-                  setNewSavings({ ...newSavings, goal: Number(e.target.value.replace(",", ".")) })
-                }
+                value={editingSavings ? editingSavings.goal ?? 0 : newSavings.goal ?? 0}
+                onChange={(e) => {
+                  const value = Number(e.target.value.replace(",", "."));
+                  if (editingSavings) {
+                    setEditingSavings({ ...editingSavings, goal: value });
+                  } else {
+                    setNewSavings({ ...newSavings, goal: value });
+                  }
+                }}
               />
-
               <Input
                 placeholder="Bedrag (€)"
-                value={editingSavings?.amount ?? newSavings.amount}
-                onChange={(e) =>
-                  setNewSavings({
-                    ...newSavings,
-                    amount: Number(e.target.value),
-                  })
-                }
+                value={editingSavings ? editingSavings.amount : newSavings.amount}
+                onChange={(e) => {
+                  const value = Number(e.target.value.replace(",", "."));
+                  if (editingSavings) {
+                    setEditingSavings({ ...editingSavings, amount: value });
+                  } else {
+                    setNewSavings({ ...newSavings, amount: value });
+                  }
+                }}
               />
               <Input
                 placeholder="Datum (YYYY-MM-DD)"
                 type="date"
-                value={editingSavings?.date ?? newSavings.date}
-                onChange={(e) =>
-                  setNewSavings({ ...newSavings, date: e.target.value })
-                }
+                value={editingSavings ? editingSavings.date : newSavings.date}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  if (editingSavings) {
+                    setEditingSavings({ ...editingSavings, date: value });
+                  } else {
+                    setNewSavings({ ...newSavings, date: value });
+                  }
+                }}
               />
               <Input
                 placeholder="Categorie"
-                value={editingSavings?.category ?? newSavings.category}
-                onChange={(e) =>
-                  setNewSavings({ ...newSavings, category: e.target.value })
-                }
+                value={editingSavings ? editingSavings.category : newSavings.category}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  if (editingSavings) {
+                    setEditingSavings({ ...editingSavings, category: value });
+                  } else {
+                    setNewSavings({ ...newSavings, category: value });
+                  }
+                }}
               />
               <Button
                 onClick={() => {
