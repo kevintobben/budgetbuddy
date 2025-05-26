@@ -221,9 +221,11 @@ const Expenses: React.FC = () => {
                 onChange={(e) =>
                   setNewExpense({
                     ...newExpense,
-                    amount: Number(e.target.value),
+                    amount: parseFloat(e.target.value.replace(",", ".")),
                   })
                 }
+                type="number"
+                step="0.01"
               />
               <Input
                 placeholder="Datum (YYYY-MM-DD)"
