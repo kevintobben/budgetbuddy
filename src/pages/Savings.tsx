@@ -195,7 +195,9 @@ const Savings: React.FC = () => {
               />
               <Input
                 placeholder="Spaardoel (€)"
-                value={editingSavings ? editingSavings.goal ?? 0 : newSavings.goal ?? 0}
+                value={editingSavings
+                  ? editingSavings.goal === 0 || editingSavings.goal === undefined ? "" : editingSavings.goal
+                  : newSavings.goal === 0 || newSavings.goal === undefined ? "" : newSavings.goal}
                 onChange={(e) => {
                   const value = Number(e.target.value.replace(",", "."));
                   if (editingSavings) {
@@ -207,7 +209,9 @@ const Savings: React.FC = () => {
               />
               <Input
                 placeholder="Bedrag (€)"
-                value={editingSavings ? editingSavings.amount : newSavings.amount}
+                value={editingSavings
+                  ? editingSavings.amount === 0 || editingSavings.amount === undefined ? "" : editingSavings.amount
+                  : newSavings.amount === 0 || newSavings.amount === undefined ? "" : newSavings.amount}
                 onChange={(e) => {
                   const value = Number(e.target.value.replace(",", "."));
                   if (editingSavings) {
