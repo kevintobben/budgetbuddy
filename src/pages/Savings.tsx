@@ -3,22 +3,12 @@ import PageLayout from "@/components/PageLayout";
 import OverviewCard from "@/components/OverviewCard";
 import { Plus } from "lucide-react"
 import { Input } from "@/components/ui/input";
-import { DropdownMenuCheckboxItemProps } from "@radix-ui/react-dropdown-menu"
 import { Button } from "@/components/ui/button"
-import {
-  DropdownMenu,
-  DropdownMenuItem,
-  DropdownMenuCheckboxItem,
-  DropdownMenuContent,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
 import { Dialog, DialogContent, DialogHeader, DialogTrigger } from "@/components/ui/dialog";
 import { useSavingsStore, SavingsRow } from "@/stores/savingsStore";
 import SavingsCard from "@/components/SavingsCard";
+import { Separator } from "@/components/ui/separator";
 
-type Checked = DropdownMenuCheckboxItemProps["checked"]
 
 const Savings: React.FC = () => {
   const savings = useSavingsStore((state) => state.savings);
@@ -26,9 +16,6 @@ const Savings: React.FC = () => {
   const removeSavings = useSavingsStore((state) => state.removeSavings);
   const [editingSavings, setEditingSavings] = React.useState<SavingsRow | null>(null);
 
-  const [showStatusBar, setShowStatusBar] = React.useState<Checked>(true);
-  const [showActivityBar, setShowActivityBar] = React.useState<Checked>(false);
-  const [showPanel, setShowPanel] = React.useState<Checked>(false);
   const [dialogOpen, setDialogOpen] = React.useState(false);
   const [newSavings, setNewSavings] = React.useState<SavingsRow>({
     name: "",
@@ -46,7 +33,7 @@ const Savings: React.FC = () => {
   return (
     <PageLayout title="Spaarpotjes">
       {/* Cards bovenaan de pagina */}
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 place-items-center pb-12">
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 place-items-center my-8">
         <OverviewCard
           title="Aantal spaarpotjes"
           amount={savings.length.toString()} 
@@ -57,92 +44,7 @@ const Savings: React.FC = () => {
         />
       </div>
 
-      {/* Filters en sortering */}
-      <div className="flex flex-wrap items-center justify-between gap-4 pb-4">
-        <div className="flex items-center gap-2">
-        <Input type="text" placeholder="Zoek op naam" className="w-64" />
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline">Categorie</Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent className="w-56">
-            {/* <Input type="text" placeholder="Zoek op naam" className="" /> */}
-            <DropdownMenuSeparator />
-            <DropdownMenuCheckboxItem
-              checked={showStatusBar}
-              onCheckedChange={setShowStatusBar}
-            >
-              Salaris
-            </DropdownMenuCheckboxItem>
-            <DropdownMenuCheckboxItem
-              checked={showActivityBar}
-              onCheckedChange={setShowActivityBar}
-            >
-              Zakgeld
-            </DropdownMenuCheckboxItem>
-            <DropdownMenuCheckboxItem
-              checked={showPanel}
-              onCheckedChange={setShowPanel}
-            >
-              Anders
-            </DropdownMenuCheckboxItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-        </div>
-
-        <div className="flex items-center gap-2">
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" size="sm">
-                Sorteer
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent>
-              <DropdownMenuLabel>Sorteer op</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem>Dag</DropdownMenuItem>
-              <DropdownMenuItem>Week</DropdownMenuItem>
-              <DropdownMenuItem>Maand</DropdownMenuItem>
-              <DropdownMenuItem>Jaar</DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline">Open</Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-56">
-              <DropdownMenuLabel>Appearance</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuCheckboxItem
-                checked={showStatusBar}
-                onCheckedChange={setShowStatusBar}
-              >
-                Naam
-              </DropdownMenuCheckboxItem>
-              <DropdownMenuCheckboxItem
-                checked={showActivityBar}
-                onCheckedChange={setShowActivityBar}
-              >
-                Prijs
-              </DropdownMenuCheckboxItem>
-              <DropdownMenuCheckboxItem
-                checked={showPanel}
-                onCheckedChange={setShowPanel}
-              >
-                Datum
-              </DropdownMenuCheckboxItem>
-              <DropdownMenuCheckboxItem
-                checked={showPanel}
-                onCheckedChange={setShowPanel}
-              >
-                Categorie
-              </DropdownMenuCheckboxItem>
-              
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
-      </div>
+      <Separator className="mb-8" />
 
       {/* Spaargeld cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 xl:grid-cols-5 gap-8 px-4 pb-6 place-items-stretch">      
