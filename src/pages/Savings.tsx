@@ -217,7 +217,7 @@ const Savings: React.FC = () => {
                   }
                 }}
               />
-              <Input
+              {/* <Input
                 placeholder="Datum (YYYY-MM-DD)"
                 type="date"
                 value={editingSavings ? editingSavings.date : newSavings.date}
@@ -229,19 +229,7 @@ const Savings: React.FC = () => {
                     setNewSavings({ ...newSavings, date: value });
                   }
                 }}
-              />
-              <Input
-                placeholder="Categorie"
-                value={editingSavings ? editingSavings.category : newSavings.category}
-                onChange={(e) => {
-                  const value = e.target.value;
-                  if (editingSavings) {
-                    setEditingSavings({ ...editingSavings, category: value });
-                  } else {
-                    setNewSavings({ ...newSavings, category: value });
-                  }
-                }}
-              />
+              /> */}
               <Button
                 onClick={() => {
                   if (editingSavings) {

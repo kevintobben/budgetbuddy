@@ -36,10 +36,13 @@ const SavingsCard: React.FC<SavingsCardProps> = ({
           <Trash2 className="w-4 h-4 text-gray-500 hover:text-red-500" />
         </button>
       </CardHeader>
-      <CardContent className="space-y-2">
-        <p className="text-lg font-semibold text-black">
-          € {amount.toLocaleString("nl-NL")}
-        </p>
+      <CardContent className="space-y-4">
+        <div className="space-y-1">
+          <p className="text-sm text-gray-500">Huidig bedrag</p>
+          <p className="text-lg font-semibold text-black">
+            € {amount.toLocaleString("nl-NL")}
+          </p>
+        </div>
         <p className="text-sm text-gray-500">Doel: € {goal.toLocaleString("nl-NL")}</p>
         <Progress value={percentage} className="h-2" />
       </CardContent>
