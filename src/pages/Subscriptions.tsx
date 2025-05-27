@@ -93,7 +93,7 @@ const Subscriptions: React.FC = () => {
           amount={subscriptions.length.toString()} 
         />
         <OverviewCard
-          title="Totaal per maand €"
+          title="Totaal per maand in €"
           amount={formattedTotal}
         />
       </div>
