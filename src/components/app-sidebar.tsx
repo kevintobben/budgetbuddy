@@ -5,6 +5,7 @@ import {
   BanknoteArrowUp,
   Settings,
   PiggyBank,
+  ChartNoAxesCombined,
 } from "lucide-react"
 import { NavLink } from "react-router-dom"
 
@@ -45,6 +46,11 @@ const items = [
     title: "Spaargeld",
     to: "/spaargeld",
     icon: PiggyBank,
+  },
+  {
+    title: "Investeringen",
+    to: "/investeringen",
+    icon: ChartNoAxesCombined,
   },
   {
     title: "Instellingen",

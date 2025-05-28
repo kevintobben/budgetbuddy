@@ -7,9 +7,10 @@ import Layout from "./Layout";
 import Home from "./pages/Home";
 import Expenses from "./pages/Expenses";
 import Income from "./pages/Income";
-import Settings from "./pages/Settings";
 import Subscriptions from "./pages/Subscriptions";
 import Savings from "./pages/Savings";
+import Investments from "./pages/Investments";
+import Settings from "./pages/Settings";
 
 function App() {
   return (
@@ -20,6 +21,7 @@ function App() {
           <Route path="income" element={<Income />} />
           <Route path="vastelasten" element={<Subscriptions />} />
           <Route path="spaargeld" element={<Savings />} />
+          <Route path="investeringen" element={<Investments />} />
           <Route path="settings" element={<Settings />} />
           <Route path="*" element={<div>404 - Pagina niet gevonden</div>} />
         </Route>

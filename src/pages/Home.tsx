@@ -29,6 +29,7 @@ const Home: React.FC = () => {
         <OverviewCard title="Uitgaven" amount={format(totalExpenses)} amountColor="text-red-500" />
         <OverviewCard title="Vaste lasten" amount={format(totalSubscriptions)} amountColor="text-blue-500" />
         <OverviewCard title="Totaal spaargeld" amount={format(totalSavings)}  amountColor="text-orange-500"/>
+        {/* <OverviewCard title="Totaal Geinvesteerd" amountColor="text-orange-500" amount={""}/> */}
       </div>
     </PageLayout>
   );
