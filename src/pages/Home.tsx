@@ -4,17 +4,20 @@ import { useIncomeStore } from "@/stores/incomeStore";
 import { useExpenseStore } from "@/stores/expenseStore";
 import { useSubscriptionsStore } from "@/stores/subscriptionsStore";
 import { useSavingsStore } from "@/stores/savingsStore";
+import {useInvestmentsStore } from "@/stores/investmensStore";
 
 const Home: React.FC = () => {
   const incomes = useIncomeStore((state) => state.incomes);
   const expenses = useExpenseStore((state) => state.expenses);
   const subscriptions = useSubscriptionsStore((state) => state.subscriptions);
   const savings = useSavingsStore((state) => state.savings);
+  const investments = useInvestmentsStore((state) => state.investments);
 
   const totalIncome = incomes.reduce((sum, i) => sum + i.amount, 0);
   const totalExpenses = expenses.reduce((sum, e) => sum + e.amount, 0);
   const totalSubscriptions = subscriptions.reduce((sum, s) => sum + s.amount, 0);
   const totalSavings = savings.reduce((sum, s) => sum + s.amount, 0);
+  const totalInvestments = investments.reduce((sum, i) => sum + i.amountInvested, 0);
 
   const leftThisMonth = totalIncome - totalExpenses - totalSubscriptions;
 
@@ -29,7 +32,7 @@ const Home: React.FC = () => {
         <OverviewCard title="Uitgaven" amount={format(totalExpenses)} amountColor="text-red-500" />
         <OverviewCard title="Vaste lasten" amount={format(totalSubscriptions)} amountColor="text-blue-500" />
         <OverviewCard title="Totaal spaargeld" amount={format(totalSavings)}  amountColor="text-orange-500"/>
-        {/* <OverviewCard title="Totaal Geinvesteerd" amountColor="text-orange-500" amount={""}/> */}
+        <OverviewCard title="Totaal Geinvesteerd" amountColor="text-orange-500" amount={format(totalInvestments)}/>
       </div>
     </PageLayout>
   );
