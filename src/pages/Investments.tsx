@@ -23,6 +23,14 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { useInvestmentsStore, InvestmentsRow } from "@/stores/investmensStore";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+
 
 const investmentsColumns = (
   onEdit: (row: InvestmentsRow) => void,
@@ -230,48 +238,78 @@ const Investments: React.FC = () => {
             <DialogHeader>
               <DialogTitle>Nieuwe investering toevoegen</DialogTitle>
             </DialogHeader>
-            <div className="space-y-3">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <Input
-                placeholder="Naam"
+                placeholder="Naam of $TSLA"
                 value={newInvestment.name}
                 onChange={(e) =>
                   setNewInvestment({ ...newInvestment, name: e.target.value })
                 }
+                className="col-span-2"
               />
               <Input
-                placeholder="Bedrag (€)"
-                value={newInvestment.amountInvested}
+                placeholder="Prijs per stuk (€)"
+                type="number"
+                step="0.01"
+                value={newInvestment.pricePerUnit || ""}
                 onChange={(e) =>
                   setNewInvestment({
                     ...newInvestment,
-                    amountInvested: parseFloat(e.target.value.replace(",", ".")),
+                    pricePerUnit: parseFloat(e.target.value.replace(",", ".")),
                   })
                 }
-                type="number"
-                step="0.01"
               />
               <Input
-                placeholder="Datum (YYYY-MM-DD)"
+                placeholder="Aantal"
+                type="number"
+                step="0.0000001"
+                value={newInvestment.units || ""}
+                onChange={(e) =>
+                  setNewInvestment({
+                    ...newInvestment,
+                    units: parseFloat(e.target.value.replace(",", ".")),
+                  })
+                }
+              />
+              <Input
                 type="date"
                 value={newInvestment.date}
                 onChange={(e) =>
                   setNewInvestment({ ...newInvestment, date: e.target.value })
                 }
               />
-              <Input
-                placeholder="Categorie"
+              <Select
                 value={newInvestment.category}
-                onChange={(e) =>
-                  setNewInvestment({ ...newInvestment, category: e.target.value })
+                onValueChange={(value) =>
+                  setNewInvestment({ ...newInvestment, category: value })
                 }
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Selecteer categorie" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Aandelen">Aandelen</SelectItem>
+                  <SelectItem value="Beleggingsfonds">Beleggingsfonds</SelectItem>
+                  <SelectItem value="Crypto">Crypto</SelectItem>
+                  <SelectItem value="ETF">ETF</SelectItem>
+                </SelectContent>
+              </Select>
+              <textarea
+                placeholder="Notitie (optioneel)"
+                value={newInvestment.note}
+                onChange={(e) =>
+                  setNewInvestment({ ...newInvestment, note: e.target.value })
+                }
+                className="col-span-2 border rounded px-3 py-2 text-sm"
               />
-              <Button onClick={handleAddInvestment} className="w-full">
+              <Button onClick={handleAddInvestment} className="w-full col-span-2">
                 Toevoegen
               </Button>
             </div>
           </DialogContent>
         </Dialog>
       </div>
+
     </PageLayout>
   );
 };
