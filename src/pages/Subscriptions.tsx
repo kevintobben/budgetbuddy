@@ -33,10 +33,10 @@ const Subscriptions: React.FC = () => {
 
   // Defineer category opties
   const categoryOptions = [
-    { id: "streaming", label: "Streaming", value: "Streaming" },
-    { id: "utilities", label: "Nutsbedrijven", value: "Nutsbedrijven" },
-    { id: "software", label: "Software", value: "Software" },
-    { id: "other", label: "Anders", value: "Anders" },
+    { id: "entertainment", label: "Entertainment", value: "Entertainment" },
+    { id: "verzekeringen", label: "Verzekeringen", value: "Verzekeringen" },
+    { id: "credit card", label: "Credit Card", value: "Credit Card" },
+    { id: "internet-tv-bellen", label: "Internet- TV & Bellen", value: "Internet- TV & Bellen" },
   ];
 
   // Gebruik de filtered data hook
