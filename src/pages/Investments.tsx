@@ -4,7 +4,6 @@ import PageLayout from "@/components/PageLayout";
 import OverviewCard from "@/components/OverviewCard";
 import { Plus } from "lucide-react";
 import { Input } from "@/components/ui/input";
-import { DropdownMenuCheckboxItemProps } from "@radix-ui/react-dropdown-menu";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -31,17 +30,12 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { createInvestmentsColumns } from "@/utils/tableColumns";
-
-type Checked = DropdownMenuCheckboxItemProps["checked"];
+import { useFilteredData } from "@/hooks/useFilteredData";
 
 const Investments: React.FC = () => {
   const investments = useInvestmentsStore((state) => state.investments);
   const addInvestment = useInvestmentsStore((state) => state.addInvestment);
   const removeInvestment = useInvestmentsStore((state) => state.removeInvestment);
-
-  const [showStatusBar, setShowStatusBar] = React.useState<Checked>(true);
-  const [showActivityBar, setShowActivityBar] = React.useState<Checked>(false);
-  const [showPanel, setShowPanel] = React.useState<Checked>(false);
   const [dialogOpen, setDialogOpen] = React.useState(false);
   const [newInvestment, setNewInvestment] = React.useState<InvestmentsRow>({
     name: "",
@@ -53,6 +47,18 @@ const Investments: React.FC = () => {
     category: "",
     note: "",
   });
+
+  const categoryOptions = [
+    { id: "etf", label: "EFT's", value: "ETF" },
+    { id: "crypto", label: "Crypto", value: "Crypto" },
+    { id: "indexfonds", label: "Indexfondsen", value: "indexfonds" },
+  ];
+
+  const { filteredData, selectedFilters, toggleFilter } = useFilteredData(
+    investments,
+    categoryOptions,
+    (investment, selectedCategories) => selectedCategories.includes(investment.category)
+  );
 
   const handleAddInvestment = () => {
     addInvestment(newInvestment);
@@ -103,24 +109,15 @@ const Investments: React.FC = () => {
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-56">
               <DropdownMenuSeparator />
-              <DropdownMenuCheckboxItem
-                checked={showStatusBar}
-                onCheckedChange={setShowStatusBar}
-              >
-                EFT's
-              </DropdownMenuCheckboxItem>
-              <DropdownMenuCheckboxItem
-                checked={showActivityBar}
-                onCheckedChange={setShowActivityBar}
-              >
-                Crypto
-              </DropdownMenuCheckboxItem>
-              <DropdownMenuCheckboxItem
-                checked={showPanel}
-                onCheckedChange={setShowPanel}
-              >
-                Indexfondsen
-              </DropdownMenuCheckboxItem>
+              {categoryOptions.map((option) => (
+                <DropdownMenuCheckboxItem
+                  key={option.id}
+                  checked={selectedFilters[option.id]}
+                  onCheckedChange={(checked) => toggleFilter(option.id, checked)}
+                >
+                  {option.label}
+                </DropdownMenuCheckboxItem>
+              ))}
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
@@ -141,40 +138,6 @@ const Investments: React.FC = () => {
               <DropdownMenuItem>Jaar</DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
-
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline">Open</Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-56">
-              <DropdownMenuLabel>Weergave</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuCheckboxItem
-                checked={showStatusBar}
-                onCheckedChange={setShowStatusBar}
-              >
-                Naam
-              </DropdownMenuCheckboxItem>
-              <DropdownMenuCheckboxItem
-                checked={showActivityBar}
-                onCheckedChange={setShowActivityBar}
-              >
-                Prijs
-              </DropdownMenuCheckboxItem>
-              <DropdownMenuCheckboxItem
-                checked={showPanel}
-                onCheckedChange={setShowPanel}
-              >
-                Datum
-              </DropdownMenuCheckboxItem>
-              <DropdownMenuCheckboxItem
-                checked={showPanel}
-                onCheckedChange={setShowPanel}
-              >
-                Categorie
-              </DropdownMenuCheckboxItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
         </div>
       </div>
 
@@ -183,7 +146,7 @@ const Investments: React.FC = () => {
           (row) => alert(`Bewerk ${row.name}`),
           (row) => removeInvestment(row)
         )}
-        data={investments}
+        data={filteredData}
       />
       
       {/* + button en de modal */}
