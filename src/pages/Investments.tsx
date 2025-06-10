@@ -227,7 +227,7 @@ const Investments: React.FC = () => {
                   })
                 }
                 type="number"
-                step="0.01"
+                step="1.00"
               />
               <Input
                 placeholder="Prijs per stuk (€)"
