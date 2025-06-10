@@ -2,7 +2,7 @@ import React from "react";
 import { BaseTable } from "@/components/BaseTable";
 import PageLayout from "@/components/PageLayout";
 import OverviewCard from "@/components/OverviewCard";
-import { Pencil, Plus, Trash2 } from "lucide-react";
+import { Plus } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { DropdownMenuCheckboxItemProps } from "@radix-ui/react-dropdown-menu";
 import { Button } from "@/components/ui/button";
@@ -30,56 +30,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-
-
-const investmentsColumns = (
-  onEdit: (row: InvestmentsRow) => void,
-  onDelete: (row: InvestmentsRow) => void
-) => [
-  { header: "Naam", key: "name" as const },
-  {
-    header: "Symbol",
-    key: "symbol" as const,
-    render: (value: string) => value.toUpperCase(),
-  },
-  {
-    header: "Bedrag",
-    key: "amountInvested" as keyof InvestmentsRow,
-    render: (value: string | number) =>
-      new Intl.NumberFormat("nl-NL", {
-        style: "currency",
-        currency: "EUR",
-      }).format(Number(value)),
-  },
-  { header: "Aantal", key: "units" as const },
-  { header: "Prijs per stuk", key: "pricePerUnit" as const },
-  {
-    header: "Datum",
-    key: "date" as const,
-    render: (value: string | number) =>
-      new Date(String(value)).toLocaleDateString("nl-NL"),
-  },
-  { header: "Categorie", key: "category" as const },
-  {
-    header: "Notitie",
-    key: "note" as const,
-    render: (value: string | undefined) => value || "-",
-  },
-  {
-    header: "Acties",
-    key: "name" as const,
-    render: (_: unknown, row: InvestmentsRow) => (
-      <div className="flex gap-2">
-        <button onClick={() => onEdit(row)} title="Bewerk">
-          <Pencil size={18} />
-        </button>
-        <button onClick={() => onDelete(row)} title="Verwijder">
-          <Trash2 size={18} />
-        </button>
-      </div>
-    ),
-  },
-];
+import { createInvestmentsColumns } from "@/utils/tableColumns";
 
 type Checked = DropdownMenuCheckboxItemProps["checked"];
 
@@ -228,7 +179,7 @@ const Investments: React.FC = () => {
       </div>
 
       <BaseTable
-        columns={investmentsColumns(
+        columns={createInvestmentsColumns(
           (row) => alert(`Bewerk ${row.name}`),
           (row) => removeInvestment(row)
         )}

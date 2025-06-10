@@ -2,7 +2,7 @@ import React from "react";
 import { BaseTable } from "@/components/BaseTable";
 import PageLayout from "@/components/PageLayout";
 import OverviewCard from "@/components/OverviewCard";
-import { Pencil, Plus, Trash2 } from "lucide-react"
+import { Plus } from "lucide-react"
 import { Input } from "@/components/ui/input";
 import { DropdownMenuCheckboxItemProps } from "@radix-ui/react-dropdown-menu"
 import { Button } from "@/components/ui/button"
@@ -17,43 +17,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { useSubscriptionsStore, SubscriptionsRow } from "@/stores/subscriptionsStore";
-
-const subscriptionColumns = (
-  onEdit: (row: SubscriptionsRow) => void,
-  onDelete: (row: SubscriptionsRow) => void
-) => [
-  { header: "Naam", key: "name" as const },
-  {
-    header: "Bedrag",
-    key: "amount" as keyof SubscriptionsRow,
-    render: (value: string | number) =>
-      new Intl.NumberFormat("nl-NL", {
-        style: "currency",
-        currency: "EUR",
-      }).format(Number(value)),
-  },
-  {
-    header: "Datum",
-    key: "date" as const,
-    render: (value: string | number) =>
-      new Date(String(value)).toLocaleDateString("nl-NL"),
-  },
-  { header: "Categorie", key: "category" as const },
-  {
-    header: "Acties",
-    key: "name" as const,
-    render: (_: unknown, row: SubscriptionsRow) => (
-      <div className="flex gap-2">
-        <button onClick={() => onEdit(row)} title="Bewerk">
-          <Pencil size={18} />
-        </button>
-        <button onClick={() => onDelete(row)} title="Verwijder">
-          <Trash2 size={18} />
-        </button>
-      </div>
-    ),
-  },
-];
+import { createSubscriptionColumns } from "@/utils/tableColumns";
 
 type Checked = DropdownMenuCheckboxItemProps["checked"]
 
@@ -185,7 +149,7 @@ const Subscriptions: React.FC = () => {
       </div>
 
       <BaseTable
-        columns={subscriptionColumns(
+        columns={createSubscriptionColumns(
           (row) => alert(`Bewerk ${row.name}`),
           (row) => removeSubscription(row)
         )}
