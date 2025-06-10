@@ -46,7 +46,7 @@ export function useFilteredData<T>(
       filtered = filtered.filter(item => filterFn(item, activeFilters));
     }
 
-    // Dan apply search term if present
+    // Dan apply search term als het aanwezig is
     if (searchTerm.trim()) {
       const searchLower = searchTerm.toLowerCase();
       filtered = filtered.filter(item => {

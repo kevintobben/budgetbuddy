@@ -3,10 +3,10 @@ import { Pencil, Trash2 } from "lucide-react";
 import { InvestmentsRow } from "@/stores/investmensStore";
 import { IncomeRow } from "@/stores/incomeStore";
 import { ExpenseRow } from "@/stores/expenseStore";
-import { SubscriptionsRow } from "@/stores/subscriptionsStore";
+import { FixedExpenseRow } from "@/stores/fixedExpensesStore";
 
 // Union types voor verschillende rijen in de tabel
-export type TableRowType = InvestmentsRow | IncomeRow | ExpenseRow | SubscriptionsRow;
+export type TableRowType = InvestmentsRow | IncomeRow | ExpenseRow | FixedExpenseRow;
 
 // Algemene kolomconfiguratie
 interface ColumnConfig<T> {
@@ -126,10 +126,10 @@ export const createExpenseColumns = (
   onDelete
 );
 
-export const createSubscriptionColumns = (
-  onEdit: (row: SubscriptionsRow) => void,
-  onDelete: (row: SubscriptionsRow) => void
-) => createCommonColumns<SubscriptionsRow>(
+export const createFixedExpenseColumns = (
+  onEdit: (row: FixedExpenseRow) => void,
+  onDelete: (row: FixedExpenseRow) => void
+) => createCommonColumns<FixedExpenseRow>(
   ['name', 'amount', 'date', 'category'],
   onEdit,
   onDelete

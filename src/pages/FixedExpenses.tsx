@@ -15,16 +15,16 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { useSubscriptionsStore, SubscriptionsRow } from "@/stores/subscriptionsStore";
-import { createSubscriptionColumns } from "@/utils/tableColumns";
+import { useFixedExpensesStore, FixedExpenseRow } from "@/stores/fixedExpensesStore";
+import { createFixedExpenseColumns } from "@/utils/tableColumns";
 import { useFilteredData } from "@/hooks/useFilteredData";
 
-const Subscriptions: React.FC = () => {
-  const subscriptions = useSubscriptionsStore((state) => state.subscriptions);
-  const addSubscription = useSubscriptionsStore((state) => state.addSubscription);
-  const removeSubscription = useSubscriptionsStore((state) => state.removeSubscription);
+const FixedExpenses: React.FC = () => {
+  const fixedExpenses = useFixedExpensesStore((state) => state.fixedExpenses);
+  const addFixedExpense = useFixedExpensesStore((state) => state.addFixedExpense);
+  const removeFixedExpense = useFixedExpensesStore((state) => state.removeFixedExpense);
   const [dialogOpen, setDialogOpen] = React.useState(false);
-  const [newSubscription, setNewSubscription] = React.useState<SubscriptionsRow>({
+  const [newFixedExpense, setNewFixedExpense] = React.useState<FixedExpenseRow>({
     name: "",
     amount: 0,
     date: "",
@@ -39,20 +39,20 @@ const Subscriptions: React.FC = () => {
     { id: "internet-tv-bellen", label: "Internet- TV & Bellen", value: "Internet- TV & Bellen" },
   ];
 
-  // Gebruik de filtered data hook
-  const { filteredData, selectedFilters, toggleFilter } = useFilteredData(
-    subscriptions,
+  // Gebruikt de filtered data hook
+  const { filteredData, selectedFilters, toggleFilter, searchTerm, setSearchTerm } = useFilteredData(
+    fixedExpenses,
     categoryOptions,
-    (subscription, selectedCategories) => selectedCategories.includes(subscription.category)
+    (fixedExpense, selectedCategories) => selectedCategories.includes(fixedExpense.category)
   );
 
-  const handleAddSubscription = () => {
-    addSubscription(newSubscription);
-    setNewSubscription({ name: "", amount: 0, date: "", category: "" });
+  const handleAddFixedExpense = () => {
+    addFixedExpense(newFixedExpense);
+    setNewFixedExpense({ name: "", amount: 0, date: "", category: "" });
     setDialogOpen(false);
   };
 
-  const totalAmount = subscriptions.reduce((sum, item) => sum + item.amount, 0);
+  const totalAmount = fixedExpenses.reduce((sum, item) => sum + item.amount, 0);
   const formattedTotal = totalAmount.toLocaleString("nl-NL", {
     style: "currency",
     currency: "EUR",
@@ -63,7 +63,7 @@ const Subscriptions: React.FC = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 place-items-center pb-12">
         <OverviewCard
           title="Aantal vaste lasten"
-          amount={subscriptions.length.toString()} 
+          amount={fixedExpenses.length.toString()} 
         />
         <OverviewCard
           title="Totaal per maand in €"
@@ -73,7 +73,13 @@ const Subscriptions: React.FC = () => {
 
       <div className="flex flex-wrap items-center justify-between gap-4 pb-4">
         <div className="flex items-center gap-2">
-          <Input type="text" placeholder="Zoek op naam" className="w-64" />
+          <Input 
+            type="text" 
+            placeholder="Zoek op naam" 
+            className="w-64"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="outline">Categorie</Button>
@@ -113,9 +119,9 @@ const Subscriptions: React.FC = () => {
       </div>
 
       <BaseTable
-        columns={createSubscriptionColumns(
+        columns={createFixedExpenseColumns(
           (row) => alert(`Bewerk ${row.name}`),
-          (row) => removeSubscription(row)
+          (row) => removeFixedExpense(row)
         )}
         data={filteredData}
       />
@@ -137,17 +143,17 @@ const Subscriptions: React.FC = () => {
             <div className="space-y-3">
               <Input
                 placeholder="Naam"
-                value={newSubscription.name}
+                value={newFixedExpense.name}
                 onChange={(e) =>
-                  setNewSubscription({ ...newSubscription, name: e.target.value })
+                  setNewFixedExpense({ ...newFixedExpense, name: e.target.value })
                 }
               />
               <Input
                 placeholder="Bedrag (€)"
-                value={newSubscription.amount}
+                value={newFixedExpense.amount}
                 onChange={(e) =>
-                  setNewSubscription({
-                    ...newSubscription,
+                  setNewFixedExpense({
+                    ...newFixedExpense,
                     amount: parseFloat(e.target.value.replace(",", ".")),
                   })
                 }
@@ -157,19 +163,19 @@ const Subscriptions: React.FC = () => {
               <Input
                 placeholder="Datum (YYYY-MM-DD)"
                 type="date"
-                value={newSubscription.date}
+                value={newFixedExpense.date}
                 onChange={(e) =>
-                  setNewSubscription({ ...newSubscription, date: e.target.value })
+                  setNewFixedExpense({ ...newFixedExpense, date: e.target.value })
                 }
               />
               <Input
                 placeholder="Categorie"
-                value={newSubscription.category}
+                value={newFixedExpense.category}
                 onChange={(e) =>
-                  setNewSubscription({ ...newSubscription, category: e.target.value })
+                  setNewFixedExpense({ ...newFixedExpense, category: e.target.value })
                 }
               />
-              <Button onClick={handleAddSubscription} className="w-full">
+              <Button onClick={handleAddFixedExpense} className="w-full">
                 Toevoegen
               </Button>
             </div>
@@ -180,4 +186,4 @@ const Subscriptions: React.FC = () => {
   );
 };
 
-export default Subscriptions;
+export default FixedExpenses;
