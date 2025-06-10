@@ -38,6 +38,11 @@ const investmentsColumns = (
 ) => [
   { header: "Naam", key: "name" as const },
   {
+    header: "Symbol",
+    key: "symbol" as const,
+    render: (value: string) => value.toUpperCase(),
+  },
+  {
     header: "Bedrag",
     key: "amountInvested" as keyof InvestmentsRow,
     render: (value: string | number) =>
@@ -46,6 +51,8 @@ const investmentsColumns = (
         currency: "EUR",
       }).format(Number(value)),
   },
+  { header: "Aantal", key: "units" as const },
+  { header: "Prijs per stuk", key: "pricePerUnit" as const },
   {
     header: "Datum",
     key: "date" as const,
@@ -53,6 +60,11 @@ const investmentsColumns = (
       new Date(String(value)).toLocaleDateString("nl-NL"),
   },
   { header: "Categorie", key: "category" as const },
+  {
+    header: "Notitie",
+    key: "note" as const,
+    render: (value: string | undefined) => value || "-",
+  },
   {
     header: "Acties",
     key: "name" as const,
@@ -86,7 +98,6 @@ const Investments: React.FC = () => {
     amountInvested: 0,
     units: 0,
     pricePerUnit: 0,
-    fee: 0,
     date: "",
     category: "",
     note: "",
@@ -94,7 +105,7 @@ const Investments: React.FC = () => {
 
   const handleAddInvestment = () => {
     addInvestment(newInvestment);
-    setNewInvestment({ name: "", symbol: "", amountInvested: 0, units: 0, pricePerUnit: 0, fee: 0, date: "", category: "", note: "" });
+    setNewInvestment({ name: "", symbol: "", amountInvested: 0, units: 0, pricePerUnit: 0, date: "", category: "", note: "" });
     setDialogOpen(false);
   };
 
@@ -131,6 +142,7 @@ const Investments: React.FC = () => {
         />
       </div>
 
+      {/* Filters */}
       <div className="flex flex-wrap items-center justify-between gap-4 pb-4">
         <div className="flex items-center gap-2">
           <Input type="text" placeholder="Zoek op naam" className="w-64" />
@@ -246,6 +258,13 @@ const Investments: React.FC = () => {
                   setNewInvestment({ ...newInvestment, name: e.target.value })
                 }
                 className="col-span-2"
+              />
+              <Input
+                placeholder="Symbool (bijv. XRP-EUR)"
+                value={newInvestment.symbol}
+                onChange={(e) =>
+                  setNewInvestment({ ...newInvestment, symbol: e.target.value })
+                }
               />
               <Input
                 placeholder="Prijs per stuk (€)"

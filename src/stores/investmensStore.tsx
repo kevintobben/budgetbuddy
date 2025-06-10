@@ -7,7 +7,6 @@ export type InvestmentsRow = {
   amountInvested: number
   units: number
   pricePerUnit: number
-  fee: number
   date: string
   category: string
   note?: string
