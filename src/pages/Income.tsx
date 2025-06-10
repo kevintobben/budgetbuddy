@@ -4,7 +4,6 @@ import PageLayout from "@/components/PageLayout";
 import OverviewCard from "@/components/OverviewCard";
 import { Plus } from "lucide-react";
 import { Input } from "@/components/ui/input";
-import { DropdownMenuCheckboxItemProps } from "@radix-ui/react-dropdown-menu";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -24,17 +23,12 @@ import {
 } from "@/components/ui/dialog";
 import { useIncomeStore, IncomeRow } from "@/stores/incomeStore";
 import { createIncomeColumns } from "@/utils/tableColumns";
-
-type Checked = DropdownMenuCheckboxItemProps["checked"];
+import { useFilteredData } from "@/hooks/useFilteredData";
 
 const Income: React.FC = () => {
   const incomes = useIncomeStore((state) => state.incomes);
   const addIncome = useIncomeStore((state) => state.addIncome);
   const removeIncome = useIncomeStore((state) => state.removeIncome);
-
-  const [showStatusBar, setShowStatusBar] = React.useState<Checked>(true);
-  const [showActivityBar, setShowActivityBar] = React.useState<Checked>(false);
-  const [showPanel, setShowPanel] = React.useState<Checked>(false);
   const [dialogOpen, setDialogOpen] = React.useState(false);
   const [newIncome, setNewIncome] = React.useState<IncomeRow>({
     name: "",
@@ -42,6 +36,20 @@ const Income: React.FC = () => {
     date: "",
     category: "",
   });
+
+  // Defineer category opties
+  const categoryOptions = [
+    { id: "salary", label: "Salaris", value: "Salaris" },
+    { id: "allowance", label: "Zakgeld", value: "Zakgeld" },
+    { id: "other", label: "Anders", value: "Anders" },
+  ];
+
+  // Gebruik de filtered data hook
+  const { filteredData, selectedFilters, toggleFilter } = useFilteredData(
+    incomes,
+    categoryOptions,
+    (income, selectedCategories) => selectedCategories.includes(income.category)
+  );
 
   const handleAddIncome = () => {
     addIncome(newIncome);
@@ -78,24 +86,15 @@ const Income: React.FC = () => {
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-56">
               <DropdownMenuSeparator />
-              <DropdownMenuCheckboxItem
-                checked={showStatusBar}
-                onCheckedChange={setShowStatusBar}
-              >
-                Salaris
-              </DropdownMenuCheckboxItem>
-              <DropdownMenuCheckboxItem
-                checked={showActivityBar}
-                onCheckedChange={setShowActivityBar}
-              >
-                Zakgeld
-              </DropdownMenuCheckboxItem>
-              <DropdownMenuCheckboxItem
-                checked={showPanel}
-                onCheckedChange={setShowPanel}
-              >
-                Anders
-              </DropdownMenuCheckboxItem>
+              {categoryOptions.map((option) => (
+                <DropdownMenuCheckboxItem
+                  key={option.id}
+                  checked={selectedFilters[option.id]}
+                  onCheckedChange={(checked) => toggleFilter(option.id, checked)}
+                >
+                  {option.label}
+                </DropdownMenuCheckboxItem>
+              ))}
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
@@ -116,40 +115,6 @@ const Income: React.FC = () => {
               <DropdownMenuItem>Jaar</DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
-
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline">Open</Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-56">
-              <DropdownMenuLabel>Weergave</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuCheckboxItem
-                checked={showStatusBar}
-                onCheckedChange={setShowStatusBar}
-              >
-                Naam
-              </DropdownMenuCheckboxItem>
-              <DropdownMenuCheckboxItem
-                checked={showActivityBar}
-                onCheckedChange={setShowActivityBar}
-              >
-                Prijs
-              </DropdownMenuCheckboxItem>
-              <DropdownMenuCheckboxItem
-                checked={showPanel}
-                onCheckedChange={setShowPanel}
-              >
-                Datum
-              </DropdownMenuCheckboxItem>
-              <DropdownMenuCheckboxItem
-                checked={showPanel}
-                onCheckedChange={setShowPanel}
-              >
-                Categorie
-              </DropdownMenuCheckboxItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
         </div>
       </div>
 
@@ -158,9 +123,10 @@ const Income: React.FC = () => {
           (row) => alert(`Bewerk ${row.name}`),
           (row) => removeIncome(row)
         )}
-        data={incomes}
+        data={filteredData}
       />
 
+      {/* Modal content remains the same */}
       <div className="fixed bottom-6 right-6 z-50">
         <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
           <DialogTrigger asChild>

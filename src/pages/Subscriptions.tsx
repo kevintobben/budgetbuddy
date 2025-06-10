@@ -2,10 +2,9 @@ import React from "react";
 import { BaseTable } from "@/components/BaseTable";
 import PageLayout from "@/components/PageLayout";
 import OverviewCard from "@/components/OverviewCard";
-import { Plus } from "lucide-react"
+import { Plus } from "lucide-react";
 import { Input } from "@/components/ui/input";
-import { DropdownMenuCheckboxItemProps } from "@radix-ui/react-dropdown-menu"
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuItem,
@@ -14,21 +13,16 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+} from "@/components/ui/dropdown-menu";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { useSubscriptionsStore, SubscriptionsRow } from "@/stores/subscriptionsStore";
 import { createSubscriptionColumns } from "@/utils/tableColumns";
-
-type Checked = DropdownMenuCheckboxItemProps["checked"]
+import { useFilteredData } from "@/hooks/useFilteredData";
 
 const Subscriptions: React.FC = () => {
   const subscriptions = useSubscriptionsStore((state) => state.subscriptions);
   const addSubscription = useSubscriptionsStore((state) => state.addSubscription);
   const removeSubscription = useSubscriptionsStore((state) => state.removeSubscription);
-
-  const [showStatusBar, setShowStatusBar] = React.useState<Checked>(true);
-  const [showActivityBar, setShowActivityBar] = React.useState<Checked>(false);
-  const [showPanel, setShowPanel] = React.useState<Checked>(false);
   const [dialogOpen, setDialogOpen] = React.useState(false);
   const [newSubscription, setNewSubscription] = React.useState<SubscriptionsRow>({
     name: "",
@@ -37,6 +31,21 @@ const Subscriptions: React.FC = () => {
     category: "",
   });
 
+  // Defineer category opties
+  const categoryOptions = [
+    { id: "streaming", label: "Streaming", value: "Streaming" },
+    { id: "utilities", label: "Nutsbedrijven", value: "Nutsbedrijven" },
+    { id: "software", label: "Software", value: "Software" },
+    { id: "other", label: "Anders", value: "Anders" },
+  ];
+
+  // Gebruik de filtered data hook
+  const { filteredData, selectedFilters, toggleFilter } = useFilteredData(
+    subscriptions,
+    categoryOptions,
+    (subscription, selectedCategories) => selectedCategories.includes(subscription.category)
+  );
+
   const handleAddSubscription = () => {
     addSubscription(newSubscription);
     setNewSubscription({ name: "", amount: 0, date: "", category: "" });
@@ -44,9 +53,9 @@ const Subscriptions: React.FC = () => {
   };
 
   const totalAmount = subscriptions.reduce((sum, item) => sum + item.amount, 0);
-    const formattedTotal = totalAmount.toLocaleString("nl-NL", {
-      style: "currency",
-      currency: "EUR",
+  const formattedTotal = totalAmount.toLocaleString("nl-NL", {
+    style: "currency",
+    currency: "EUR",
   });
 
   return (
@@ -64,34 +73,24 @@ const Subscriptions: React.FC = () => {
 
       <div className="flex flex-wrap items-center justify-between gap-4 pb-4">
         <div className="flex items-center gap-2">
-        <Input type="text" placeholder="Zoek op naam" className="w-64" />
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline">Categorie</Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent className="w-56">
-            {/* <Input type="text" placeholder="Zoek op naam" className="" /> */}
-            <DropdownMenuSeparator />
-            <DropdownMenuCheckboxItem
-              checked={showStatusBar}
-              onCheckedChange={setShowStatusBar}
-            >
-              Salaris
-            </DropdownMenuCheckboxItem>
-            <DropdownMenuCheckboxItem
-              checked={showActivityBar}
-              onCheckedChange={setShowActivityBar}
-            >
-              Zakgeld
-            </DropdownMenuCheckboxItem>
-            <DropdownMenuCheckboxItem
-              checked={showPanel}
-              onCheckedChange={setShowPanel}
-            >
-              Anders
-            </DropdownMenuCheckboxItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+          <Input type="text" placeholder="Zoek op naam" className="w-64" />
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline">Categorie</Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="w-56">
+              <DropdownMenuSeparator />
+              {categoryOptions.map((option) => (
+                <DropdownMenuCheckboxItem
+                  key={option.id}
+                  checked={selectedFilters[option.id]}
+                  onCheckedChange={(checked) => toggleFilter(option.id, checked)}
+                >
+                  {option.label}
+                </DropdownMenuCheckboxItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
 
         <div className="flex items-center gap-2">
@@ -110,41 +109,6 @@ const Subscriptions: React.FC = () => {
               <DropdownMenuItem>Jaar</DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
-
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline">Open</Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-56">
-              <DropdownMenuLabel>Appearance</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuCheckboxItem
-                checked={showStatusBar}
-                onCheckedChange={setShowStatusBar}
-              >
-                Naam
-              </DropdownMenuCheckboxItem>
-              <DropdownMenuCheckboxItem
-                checked={showActivityBar}
-                onCheckedChange={setShowActivityBar}
-              >
-                Prijs
-              </DropdownMenuCheckboxItem>
-              <DropdownMenuCheckboxItem
-                checked={showPanel}
-                onCheckedChange={setShowPanel}
-              >
-                Datum
-              </DropdownMenuCheckboxItem>
-              <DropdownMenuCheckboxItem
-                checked={showPanel}
-                onCheckedChange={setShowPanel}
-              >
-                Categorie
-              </DropdownMenuCheckboxItem>
-              
-            </DropdownMenuContent>
-          </DropdownMenu>
         </div>
       </div>
 
@@ -153,7 +117,7 @@ const Subscriptions: React.FC = () => {
           (row) => alert(`Bewerk ${row.name}`),
           (row) => removeSubscription(row)
         )}
-        data={subscriptions}
+        data={filteredData}
       />
 
       <div className="fixed bottom-6 right-6 z-50">

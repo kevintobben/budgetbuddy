@@ -48,12 +48,14 @@ const Investments: React.FC = () => {
     note: "",
   });
 
+  // Defineer category opties
   const categoryOptions = [
     { id: "etf", label: "EFT's", value: "ETF" },
     { id: "crypto", label: "Crypto", value: "Crypto" },
     { id: "indexfonds", label: "Indexfondsen", value: "indexfonds" },
   ];
 
+  // Gebruik de filtered data hook
   const { filteredData, selectedFilters, toggleFilter } = useFilteredData(
     investments,
     categoryOptions,

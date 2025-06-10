@@ -18,8 +18,11 @@ export function useFilteredData<T>(
   const [selectedFilters, setSelectedFilters] = useState<Record<string, Checked>>(
     Object.fromEntries(options.map(option => [option.id, false]))
   );
+  
+  // Voeg zoek functionaliteit toe
+  const [searchTerm, setSearchTerm] = useState("");
 
-  // Toggle een specifieke filter
+  // Toggl een specifieke filter
   const toggleFilter = (id: string, checked: Checked) => {
     setSelectedFilters(prev => ({
       ...prev,
@@ -27,27 +30,42 @@ export function useFilteredData<T>(
     }));
   };
 
-  // Krijg de actieve filters op basis van de geselecteerde filters
+  // Krijg active filter values
   const activeFilters = useMemo(() => 
     Object.entries(selectedFilters)
-      .filter(([_, isChecked]) => isChecked)
+      .filter(([, isChecked]) => isChecked)
       .map(([id]) => options.find(opt => opt.id === id)?.value || ''),
     [selectedFilters, options]
   );
 
   // Filter de data
   const filteredData = useMemo(() => {
-    // Als er geen actieve filters zijn, retourneer de originele data
-    if (activeFilters.length === 0) return data;
+    let filtered = data;
+    
+    if (activeFilters.length > 0) {
+      filtered = filtered.filter(item => filterFn(item, activeFilters));
+    }
 
-    // Anders pas de aangepaste filterfunctie toe
-    return data.filter(item => filterFn(item, activeFilters));
-  }, [data, activeFilters, filterFn]);
+    // Dan apply search term if present
+    if (searchTerm.trim()) {
+      const searchLower = searchTerm.toLowerCase();
+      filtered = filtered.filter(item => {
+        // Zoek in alle string properties van het item
+        return Object.entries(item as Record<string, unknown>).some(([, value]) => {
+          return typeof value === 'string' && value.toLowerCase().includes(searchLower);
+        });
+      });
+    }
+    
+    return filtered;
+  }, [data, activeFilters, filterFn, searchTerm]);
 
   return {
     filteredData,
     selectedFilters,
     toggleFilter,
+    searchTerm,
+    setSearchTerm,
     filterOptions: options
   };
 }

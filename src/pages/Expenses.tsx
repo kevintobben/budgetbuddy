@@ -2,10 +2,9 @@ import React from "react";
 import { BaseTable } from "@/components/BaseTable";
 import PageLayout from "@/components/PageLayout";
 import OverviewCard from "@/components/OverviewCard";
-import { Plus } from "lucide-react"
+import { Plus } from "lucide-react";
 import { Input } from "@/components/ui/input";
-import { DropdownMenuCheckboxItemProps } from "@radix-ui/react-dropdown-menu"
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuItem,
@@ -14,21 +13,16 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+} from "@/components/ui/dropdown-menu";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { useExpenseStore, ExpenseRow } from "@/stores/expenseStore";
 import { createExpenseColumns } from "@/utils/tableColumns";
-
-type Checked = DropdownMenuCheckboxItemProps["checked"]
+import { useFilteredData } from "@/hooks/useFilteredData";
 
 const Expenses: React.FC = () => {
   const expenses = useExpenseStore((state) => state.expenses);
   const addExpense = useExpenseStore((state) => state.addExpense);
   const removeExpense = useExpenseStore((state) => state.removeExpense);
-
-  const [showStatusBar, setShowStatusBar] = React.useState<Checked>(true);
-  const [showActivityBar, setShowActivityBar] = React.useState<Checked>(false);
-  const [showPanel, setShowPanel] = React.useState<Checked>(false);
   const [dialogOpen, setDialogOpen] = React.useState(false);
   const [newExpense, setNewExpense] = React.useState<ExpenseRow>({
     name: "",
@@ -37,6 +31,21 @@ const Expenses: React.FC = () => {
     category: "",
   });
 
+  // Defineer category opties
+  const categoryOptions = [
+    { id: "food", label: "Eten", value: "Eten" },
+    { id: "transport", label: "Transport", value: "Transport" },
+    { id: "entertainment", label: "Entertainment", value: "Entertainment" },
+    { id: "other", label: "Anders", value: "Anders" },
+  ];
+
+  // Gebruik de filtered data hook
+  const { filteredData, selectedFilters, toggleFilter } = useFilteredData(
+    expenses,
+    categoryOptions,
+    (expense, selectedCategories) => selectedCategories.includes(expense.category)
+  );
+
   const handleAddExpense = () => {
     addExpense(newExpense);
     setNewExpense({ name: "", amount: 0, date: "", category: "" });
@@ -44,9 +53,9 @@ const Expenses: React.FC = () => {
   };
 
   const totalAmount = expenses.reduce((sum, item) => sum + item.amount, 0);
-    const formattedTotal = totalAmount.toLocaleString("nl-NL", {
-      style: "currency",
-      currency: "EUR",
+  const formattedTotal = totalAmount.toLocaleString("nl-NL", {
+    style: "currency",
+    currency: "EUR",
   });
 
   return (
@@ -57,7 +66,7 @@ const Expenses: React.FC = () => {
           amount={expenses.length.toString()} 
         />
         <OverviewCard
-          title="Aatanl uitgaven in €"
+          title="Aantal uitgaven in €"
           amount={formattedTotal}
           amountColor="text-red-500"
         />
@@ -65,34 +74,24 @@ const Expenses: React.FC = () => {
 
       <div className="flex flex-wrap items-center justify-between gap-4 pb-4">
         <div className="flex items-center gap-2">
-        <Input type="text" placeholder="Zoek op naam" className="w-64" />
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline">Categorie</Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent className="w-56">
-            {/* <Input type="text" placeholder="Zoek op naam" className="" /> */}
-            <DropdownMenuSeparator />
-            <DropdownMenuCheckboxItem
-              checked={showStatusBar}
-              onCheckedChange={setShowStatusBar}
-            >
-              Salaris
-            </DropdownMenuCheckboxItem>
-            <DropdownMenuCheckboxItem
-              checked={showActivityBar}
-              onCheckedChange={setShowActivityBar}
-            >
-              Zakgeld
-            </DropdownMenuCheckboxItem>
-            <DropdownMenuCheckboxItem
-              checked={showPanel}
-              onCheckedChange={setShowPanel}
-            >
-              Anders
-            </DropdownMenuCheckboxItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+          <Input type="text" placeholder="Zoek op naam" className="w-64" />
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline">Categorie</Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="w-56">
+              <DropdownMenuSeparator />
+              {categoryOptions.map((option) => (
+                <DropdownMenuCheckboxItem
+                  key={option.id}
+                  checked={selectedFilters[option.id]}
+                  onCheckedChange={(checked) => toggleFilter(option.id, checked)}
+                >
+                  {option.label}
+                </DropdownMenuCheckboxItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
 
         <div className="flex items-center gap-2">
@@ -111,41 +110,6 @@ const Expenses: React.FC = () => {
               <DropdownMenuItem>Jaar</DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
-
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline">Open</Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-56">
-              <DropdownMenuLabel>Appearance</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuCheckboxItem
-                checked={showStatusBar}
-                onCheckedChange={setShowStatusBar}
-              >
-                Naam
-              </DropdownMenuCheckboxItem>
-              <DropdownMenuCheckboxItem
-                checked={showActivityBar}
-                onCheckedChange={setShowActivityBar}
-              >
-                Prijs
-              </DropdownMenuCheckboxItem>
-              <DropdownMenuCheckboxItem
-                checked={showPanel}
-                onCheckedChange={setShowPanel}
-              >
-                Datum
-              </DropdownMenuCheckboxItem>
-              <DropdownMenuCheckboxItem
-                checked={showPanel}
-                onCheckedChange={setShowPanel}
-              >
-                Categorie
-              </DropdownMenuCheckboxItem>
-              
-            </DropdownMenuContent>
-          </DropdownMenu>
         </div>
       </div>
 
@@ -154,7 +118,7 @@ const Expenses: React.FC = () => {
           (row) => alert(`Bewerk ${row.name}`),
           (row) => removeExpense(row)
         )}
-        data={expenses}
+        data={filteredData}
       />
 
       <div className="fixed bottom-6 right-6 z-50">
