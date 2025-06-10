@@ -267,6 +267,18 @@ const Investments: React.FC = () => {
                 }
               />
               <Input
+                placeholder="Bedrag (€)"
+                value={newInvestment.amountInvested}
+                onChange={(e) =>
+                  setNewInvestment({
+                    ...newInvestment,
+                    amountInvested: parseFloat(e.target.value.replace(",", ".")),
+                  })
+                }
+                type="number"
+                step="0.01"
+              />
+              <Input
                 placeholder="Prijs per stuk (€)"
                 type="number"
                 step="0.01"
