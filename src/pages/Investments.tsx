@@ -49,13 +49,6 @@ const Investments: React.FC = () => {
       placeholder: "Symbool (bijv. XRP-EUR)",
     },
     {
-      name: "amountInvested",
-      label: "Bedrag",
-      type: "number",
-      placeholder: "Bedrag (€)",
-      step: "1.00",
-    },
-    {
       name: "pricePerUnit",
       label: "Prijs per stuk",
       type: "number",
@@ -63,10 +56,10 @@ const Investments: React.FC = () => {
       step: "0.01",
     },
     {
-      name: "units",
-      label: "Aantal",
+      name: "unitsReceived",
+      label: "Aantal ontvangen",
       type: "number",
-      placeholder: "Aantal",
+      placeholder: "Aantal ontvangen",
       step: "0.0000001",
     },
     {
