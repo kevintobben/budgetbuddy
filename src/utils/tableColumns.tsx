@@ -69,7 +69,7 @@ export const createCommonColumns = <T extends TableRowType>(
       key: "amountInvested" as keyof T,
       render: (value: unknown) => formatCurrency(value as string | number)
     },
-    units: { header: "Aantal", key: "units" as keyof T },
+    unitsReceived: { header: "Aantal ontvangen", key: "unitsReceived" as keyof T },
     pricePerUnit: { header: "Prijs per stuk", key: "pricePerUnit" as keyof T },
     date: { 
       header: "Datum", 

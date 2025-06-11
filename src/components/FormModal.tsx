@@ -52,7 +52,24 @@ export function FormModal<T extends Record<string, unknown>>({
   gridLayout = false,
 }: FormModalProps<T>) {
   const handleChange = (fieldName: string, fieldValue: unknown) => {
-    onChange({ ...value, [fieldName]: fieldValue });
+    const newValue = { ...value, [fieldName]: fieldValue };
+
+    // Auto-calculate amountInvested wanneer pricePerUnit of unitsReceived verandert
+    if (
+      (fieldName === "pricePerUnit" || fieldName === "unitsReceived") &&
+      "pricePerUnit" in newValue &&
+      "unitsReceived" in newValue
+    ) {
+      const price = Number(newValue.pricePerUnit) || 0;
+      const units = Number(newValue.unitsReceived) || 0;
+      onChange({
+        ...newValue,
+        amountInvested: parseFloat((price * units).toFixed(2)),
+      } as T);
+      return;
+    }
+
+    onChange(newValue as T);
   };
 
   const handleNumberChange = (fieldName: string, rawValue: string) => {
@@ -69,7 +86,11 @@ export function FormModal<T extends Record<string, unknown>>({
         return (
           <Input
             placeholder={field.placeholder}
-            value={typeof fieldValue === "string" || typeof fieldValue === "number" ? fieldValue : ""}
+            value={
+              typeof fieldValue === "string" || typeof fieldValue === "number"
+                ? fieldValue
+                : ""
+            }
             onChange={(e) => handleChange(field.name, e.target.value)}
             className={field.className}
           />
@@ -119,7 +140,9 @@ export function FormModal<T extends Record<string, unknown>>({
             placeholder={field.placeholder}
             value={typeof fieldValue === "string" ? fieldValue : ""}
             onChange={(e) => handleChange(field.name, e.target.value)}
-            className={`border rounded px-3 py-2 text-sm w-full ${field.className || ""}`}
+            className={`border rounded px-3 py-2 text-sm w-full ${
+              field.className || ""
+            }`}
           />
         );
       default:
@@ -141,7 +164,13 @@ export function FormModal<T extends Record<string, unknown>>({
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
         </DialogHeader>
-        <div className={gridLayout ? "grid grid-cols-1 md:grid-cols-2 gap-3" : "space-y-3"}>
+        <div
+          className={
+            gridLayout
+              ? "grid grid-cols-1 md:grid-cols-2 gap-3"
+              : "space-y-3"
+          }
+        >
           {fields.map((field) => (
             <div
               key={field.name}
@@ -162,7 +191,7 @@ export function FormModal<T extends Record<string, unknown>>({
   );
 }
 
-// A simpler version that includes the dialog state management
+// Een simpelere versie die de dialog state beheert
 export function AddItemModal<T extends Record<string, unknown>>({
   title,
   fields,
@@ -183,7 +212,7 @@ export function AddItemModal<T extends Record<string, unknown>>({
 
   React.useEffect(() => {
     if (!open) {
-      // Reset form when closing
+      // Reset form wanneer de modal sluit
       setValue(initialValue);
     }
   }, [open, initialValue]);

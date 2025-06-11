@@ -63,6 +63,14 @@ const Investments: React.FC = () => {
       step: "0.0000001",
     },
     {
+      name: "amountInvested",
+      label: "Bedrag geïnvesteerd",
+      type: "number",
+      placeholder: "Automatisch berekend",
+      step: "0.01",
+      className: "bg-gray-100",
+    },
+    {
       name: "date",
       label: "Datum",
       type: "date",
@@ -101,7 +109,13 @@ const Investments: React.FC = () => {
   );
 
   const handleAddInvestment = () => {
-    addInvestment(newInvestment);
+    // Zorg ervoor dat amountInvested is berekend voordat we toevoegen
+    const calculatedInvestment = {
+      ...newInvestment,
+      amountInvested: newInvestment.pricePerUnit * newInvestment.unitsReceived
+    };
+    
+    addInvestment(calculatedInvestment);
     setNewInvestment({ name: "", symbol: "", amountInvested: 0, unitsReceived: 0, pricePerUnit: 0, date: "", category: "", note: "" });
     setDialogOpen(false);
   };
