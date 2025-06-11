@@ -103,7 +103,7 @@ export const createInvestmentsColumns = (
   onEdit: (row: InvestmentsRow) => void,
   onDelete: (row: InvestmentsRow) => void
 ) => createCommonColumns<InvestmentsRow>(
-  ['name', 'symbol', 'amountInvested', 'units', 'pricePerUnit', 'date', 'category', 'note'],
+  ['name', 'symbol', 'amountInvested', 'unitsReceived', 'pricePerUnit', 'date', 'category', 'note'],
   onEdit,
   onDelete
 );

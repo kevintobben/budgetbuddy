@@ -27,7 +27,7 @@ const Investments: React.FC = () => {
     name: "",
     symbol: "",
     amountInvested: 0,
-    units: 0,
+    unitsReceived: 0,
     pricePerUnit: 0,
     date: "",
     category: "",
@@ -95,14 +95,12 @@ const Investments: React.FC = () => {
     },
   ];
 
-  // Defineer category opties
   const categoryOptions = [
     { id: "etf", label: "EFT's", value: "ETF" },
     { id: "crypto", label: "Crypto", value: "Crypto" },
     { id: "indexfonds", label: "Indexfondsen", value: "indexfonds" },
   ];
 
-  // Gebruik de filtered data hook
   const { filteredData, selectedFilters, toggleFilter } = useFilteredData(
     investments,
     categoryOptions,
@@ -111,7 +109,7 @@ const Investments: React.FC = () => {
 
   const handleAddInvestment = () => {
     addInvestment(newInvestment);
-    setNewInvestment({ name: "", symbol: "", amountInvested: 0, units: 0, pricePerUnit: 0, date: "", category: "", note: "" });
+    setNewInvestment({ name: "", symbol: "", amountInvested: 0, unitsReceived: 0, pricePerUnit: 0, date: "", category: "", note: "" });
     setDialogOpen(false);
   };
 
