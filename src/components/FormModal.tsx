@@ -51,6 +51,9 @@ export function FormModal<T extends Record<string, unknown>>({
   onOpenChange,
   gridLayout = false,
 }: FormModalProps<T>) {
+  // Track raw input values for number fields
+  const [rawInputs, setRawInputs] = React.useState<Record<string, string>>({});
+
   const handleChange = (fieldName: string, fieldValue: unknown) => {
     const newValue = { ...value, [fieldName]: fieldValue };
 
@@ -73,8 +76,27 @@ export function FormModal<T extends Record<string, unknown>>({
   };
 
   const handleNumberChange = (fieldName: string, rawValue: string) => {
-    const parsedValue = parseFloat(rawValue.replace(",", "."));
-    handleChange(fieldName, parsedValue);
+    // Store the raw input value
+    setRawInputs((prev) => ({ ...prev, [fieldName]: rawValue }));
+
+    // Only try to parse and update if there's actually a value
+    // This allows typing "0" or "," as first characters
+    if (rawValue.trim() === "" || rawValue === "0" || rawValue === ",") {
+      // For empty inputs or just zero/comma, set to 0 or keep raw value for display
+      handleChange(fieldName, 0);
+      return;
+    }
+
+    // Normalize commas to dots for parsing
+    const normalizedValue = rawValue.replace(",", ".");
+
+    // Parse the value, but only if it's a valid number
+    if (/^-?\d*\.?\d*$/.test(normalizedValue)) {
+      const parsedValue = parseFloat(normalizedValue);
+      if (!isNaN(parsedValue)) {
+        handleChange(fieldName, parsedValue);
+      }
+    }
   };
 
   const renderField = (field: FormField) => {
@@ -96,16 +118,26 @@ export function FormModal<T extends Record<string, unknown>>({
           />
         );
       case "number":
+        // Use the raw input value if available, otherwise format the stored value
+        { const rawValue = rawInputs[field.name];
+        const displayVal =
+          rawValue !== undefined
+            ? rawValue
+            : typeof displayValue === "number"
+            ? displayValue.toString().replace(".", ",")
+            : "";
+
         return (
           <Input
             placeholder={field.placeholder}
-            value={typeof displayValue === "number" ? displayValue : ""}
+            value={displayVal}
             onChange={(e) => handleNumberChange(field.name, e.target.value)}
-            type="number"
+            type="text"
+            inputMode="decimal"
             step={field.step || "0.01"}
             className={field.className}
           />
-        );
+        ); }
       case "date":
         return (
           <Input
@@ -149,6 +181,11 @@ export function FormModal<T extends Record<string, unknown>>({
         return null;
     }
   };
+
+  // Reset raw inputs when dialog opens/closes
+  React.useEffect(() => {
+    setRawInputs({});
+  }, [open]);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>

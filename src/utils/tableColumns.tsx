@@ -22,6 +22,13 @@ export const formatCurrency = (value: string | number) =>
     currency: "EUR",
   }).format(Number(value));
 
+// Nummer formatter functie voor units (ondersteunt kleine decimale getallen)
+export const formatNumber = (value: string | number) =>
+  new Intl.NumberFormat("nl-NL", {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 8,
+  }).format(Number(value));
+
 // Date formatter functie
 export const formatDate = (value: string | number) =>
   new Date(String(value)).toLocaleDateString("nl-NL");
@@ -33,7 +40,7 @@ export const createActionsColumn = <T extends TableRowType>(
 ): ColumnConfig<T> => ({
   header: "Acties",
   key: "name" as keyof T,
-  render: (_: unknown, row?: T) => 
+  render: (_: unknown, row?: T) =>
     row ? (
       <div className="flex gap-2">
         <button onClick={() => onEdit(row)} title="Bewerk">
@@ -54,47 +61,60 @@ export const createCommonColumns = <T extends TableRowType>(
 ) => {
   const columnsMap: Record<string, ColumnConfig<T>> = {
     name: { header: "Naam", key: "name" as keyof T },
-    symbol: { 
-      header: "Symbol", 
+    symbol: {
+      header: "Symbol",
       key: "symbol" as keyof T,
-      render: (value: unknown) => typeof value === "string" ? value.toUpperCase() : ""
+      render: (value: unknown) => (typeof value === "string" ? value.toUpperCase() : ""),
     },
-    amount: { 
-      header: "Bedrag", 
+    amount: {
+      header: "Bedrag",
       key: "amount" as keyof T,
-      render: (value: unknown) => formatCurrency(value as string | number)
+      render: (value: unknown) => formatCurrency(value as string | number),
     },
-    amountInvested: { 
-      header: "Bedrag", 
+    amountInvested: {
+      header: "Bedrag",
       key: "amountInvested" as keyof T,
-      render: (value: unknown) => formatCurrency(value as string | number)
+      render: (value: unknown) => formatCurrency(value as string | number),
     },
-    unitsReceived: { header: "Aantal ontvangen", key: "unitsReceived" as keyof T },
-    pricePerUnit: { header: "Prijs per stuk", key: "pricePerUnit" as keyof T },
-    date: { 
-      header: "Datum", 
+    unitsReceived: {
+      header: "Aantal ontvangen",
+      key: "unitsReceived" as keyof T,
+      render: (value: unknown) => formatNumber(value as string | number),
+    },
+    pricePerUnit: {
+      header: "Prijs per stuk",
+      key: "pricePerUnit" as keyof T,
+      render: (value: unknown) => formatCurrency(value as string | number),
+    },
+    date: {
+      header: "Datum",
       key: "date" as keyof T,
-      render: (value: unknown) => formatDate(value as string | number)
+      render: (value: unknown) => formatDate(value as string | number),
     },
-    category: { header: "Categorie", key: "category" as keyof T },
-    note: { 
-      header: "Notitie", 
+    category: { 
+      header: "Categorie", 
+      key: "category" as keyof T,
+      // Zorg ervoor dat de categorie correct wordt weergegeven
+      render: (value: unknown) => typeof value === "string" ? value : ""
+    },
+    note: {
+      header: "Notitie",
       key: "note" as keyof T,
       render: (value: unknown) => {
         const strValue = typeof value === "string" ? value : undefined;
         return strValue || "-";
-      }
-    }
+      },
+    },
   };
-  
+
   // Filter en map de kolommen op basis van de meegegeven keys
   const columns = includedColumns
-    .map(key => columnsMap[key as string])
+    .map((key) => columnsMap[key as string])
     .filter(Boolean);
-  
+
   // Voeg actie kolom toe
   columns.push(createActionsColumn(onEdit, onDelete));
-  
+
   return columns;
 };
 
@@ -102,35 +122,24 @@ export const createCommonColumns = <T extends TableRowType>(
 export const createInvestmentsColumns = (
   onEdit: (row: InvestmentsRow) => void,
   onDelete: (row: InvestmentsRow) => void
-) => createCommonColumns<InvestmentsRow>(
-  ['name', 'symbol', 'amountInvested', 'unitsReceived', 'pricePerUnit', 'date', 'category', 'note'],
-  onEdit,
-  onDelete
-);
+) =>
+  createCommonColumns<InvestmentsRow>(
+    ["name", "symbol", "amountInvested", "unitsReceived", "pricePerUnit", "date", "category", "note"],
+    onEdit,
+    onDelete
+  );
 
 export const createIncomeColumns = (
   onEdit: (row: IncomeRow) => void,
   onDelete: (row: IncomeRow) => void
-) => createCommonColumns<IncomeRow>(
-  ['name', 'amount', 'date', 'category'],
-  onEdit,
-  onDelete
-);
+) => createCommonColumns<IncomeRow>(["name", "amount", "date", "category"], onEdit, onDelete);
 
 export const createExpenseColumns = (
   onEdit: (row: ExpenseRow) => void,
   onDelete: (row: ExpenseRow) => void
-) => createCommonColumns<ExpenseRow>(
-  ['name', 'amount', 'date', 'category'],
-  onEdit,
-  onDelete
-);
+) => createCommonColumns<ExpenseRow>(["name", "amount", "date", "category"], onEdit, onDelete);
 
 export const createFixedExpenseColumns = (
   onEdit: (row: FixedExpenseRow) => void,
   onDelete: (row: FixedExpenseRow) => void
-) => createCommonColumns<FixedExpenseRow>(
-  ['name', 'amount', 'date', 'category'],
-  onEdit,
-  onDelete
-);
+) => createCommonColumns<FixedExpenseRow>(["name", "amount", "date", "category"], onEdit, onDelete);

@@ -99,7 +99,7 @@ const Investments: React.FC = () => {
   const categoryOptions = [
     { id: "etf", label: "EFT's", value: "ETF" },
     { id: "crypto", label: "Crypto", value: "Crypto" },
-    { id: "indexfonds", label: "Indexfondsen", value: "indexfonds" },
+    { id: "indexfonds", label: "Indexfondsen", value: "Beleggingsfonds" },
   ];
 
   const { filteredData, selectedFilters, toggleFilter } = useFilteredData(
@@ -126,6 +126,13 @@ const Investments: React.FC = () => {
     currency: "EUR",
   });
 
+  // Categorietellers voor overview cards
+  const categoryCount = {
+    crypto: investments.filter((inv) => inv.category === "Crypto").length,
+    etf: investments.filter((inv) => inv.category === "ETF").length,
+    indexfonds: investments.filter((inv) => inv.category === "Beleggingsfonds").length,
+  };
+
   return (
     <PageLayout title="Investeringen">
       {/* Cards bovenaan de pagina */}
@@ -141,15 +148,15 @@ const Investments: React.FC = () => {
         />
         <OverviewCard
           title="Aantal cryptovaluta's"
-          amount={investments.filter((inv) => inv.category === "crypto").length.toString()}
+          amount={categoryCount.crypto.toString()}
         />
         <OverviewCard
           title="Aantal EFT's"
-          amount={investments.filter((inv) => inv.category === "ETF").length.toString()}
+          amount={categoryCount.etf.toString()}
         />
         <OverviewCard
           title="Aantal indexfondsen"
-          amount={investments.filter((inv) => inv.category === "indexfonds").length.toString()}
+          amount={categoryCount.indexfonds.toString()}
         />
       </div>
 
