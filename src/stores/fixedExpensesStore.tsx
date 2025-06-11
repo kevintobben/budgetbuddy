@@ -5,6 +5,7 @@ export interface FixedExpenseRow {
   amount: number;
   date: string;
   category: string;
+  [key: string]: unknown;
 }
 
 interface FixedExpensesState {

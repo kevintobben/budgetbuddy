@@ -2,7 +2,6 @@ import React from "react";
 import { BaseTable } from "@/components/BaseTable";
 import PageLayout from "@/components/PageLayout";
 import OverviewCard from "@/components/OverviewCard";
-import { Plus } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
@@ -14,10 +13,10 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { useFixedExpensesStore, FixedExpenseRow } from "@/stores/fixedExpensesStore";
 import { createFixedExpenseColumns } from "@/utils/tableColumns";
 import { useFilteredData } from "@/hooks/useFilteredData";
+import { FormModal, FormField } from "@/components/FormModal";
 
 const FixedExpenses: React.FC = () => {
   const fixedExpenses = useFixedExpensesStore((state) => state.fixedExpenses);
@@ -30,6 +29,40 @@ const FixedExpenses: React.FC = () => {
     date: "",
     category: "",
   });
+
+  const fixedExpenseFormFields: FormField[] = [
+    {
+      name: "name",
+      label: "Naam",
+      type: "text",
+      placeholder: "Naam",
+    },
+    {
+      name: "amount",
+      label: "Bedrag",
+      type: "number",
+      placeholder: "Bedrag (€)",
+      step: "0.01",
+    },
+    {
+      name: "date",
+      label: "Datum",
+      type: "date",
+      placeholder: "Datum",
+    },
+    {
+      name: "category",
+      label: "Categorie",
+      type: "select",
+      placeholder: "Selecteer categorie",
+      options: [
+        { value: "Entertainment", label: "Entertainment" },
+        { value: "Verzekeringen", label: "Verzekeringen" },
+        { value: "Credit Card", label: "Credit Card" },
+        { value: "Internet- TV & Bellen", label: "Internet- TV & Bellen" },
+      ],
+    },
+  ];
 
   // Defineer category opties
   const categoryOptions = [
@@ -126,62 +159,15 @@ const FixedExpenses: React.FC = () => {
         data={filteredData}
       />
 
-      <div className="fixed bottom-6 right-6 z-50">
-        <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-          <DialogTrigger asChild>
-            <Button
-              className="rounded-full w-12 h-12 p-0 shadow-lg"
-              title="Toevoegen"
-            >
-              <Plus className="w-6 h-6" />
-            </Button>
-          </DialogTrigger>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Nieuwe vaste last toevoegen</DialogTitle>
-            </DialogHeader>
-            <div className="space-y-3">
-              <Input
-                placeholder="Naam"
-                value={newFixedExpense.name}
-                onChange={(e) =>
-                  setNewFixedExpense({ ...newFixedExpense, name: e.target.value })
-                }
-              />
-              <Input
-                placeholder="Bedrag (€)"
-                value={newFixedExpense.amount}
-                onChange={(e) =>
-                  setNewFixedExpense({
-                    ...newFixedExpense,
-                    amount: parseFloat(e.target.value.replace(",", ".")),
-                  })
-                }
-                type="number"
-                step="0.01"
-              />
-              <Input
-                placeholder="Datum (YYYY-MM-DD)"
-                type="date"
-                value={newFixedExpense.date}
-                onChange={(e) =>
-                  setNewFixedExpense({ ...newFixedExpense, date: e.target.value })
-                }
-              />
-              <Input
-                placeholder="Categorie"
-                value={newFixedExpense.category}
-                onChange={(e) =>
-                  setNewFixedExpense({ ...newFixedExpense, category: e.target.value })
-                }
-              />
-              <Button onClick={handleAddFixedExpense} className="w-full">
-                Toevoegen
-              </Button>
-            </div>
-          </DialogContent>
-        </Dialog>
-      </div>
+      <FormModal
+        title="Nieuwe vaste last toevoegen"
+        fields={fixedExpenseFormFields}
+        value={newFixedExpense}
+        onChange={setNewFixedExpense}
+        onSubmit={handleAddFixedExpense}
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
+      />
     </PageLayout>
   );
 };

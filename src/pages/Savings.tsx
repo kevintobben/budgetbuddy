@@ -1,21 +1,16 @@
 import React from "react";
 import PageLayout from "@/components/PageLayout";
 import OverviewCard from "@/components/OverviewCard";
-import { Plus } from "lucide-react"
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button"
-import { Dialog, DialogContent, DialogHeader, DialogTrigger } from "@/components/ui/dialog";
 import { useSavingsStore, SavingsRow } from "@/stores/savingsStore";
 import SavingsCard from "@/components/SavingsCard";
 import { Separator } from "@/components/ui/separator";
-
+import { FormModal, FormField } from "@/components/FormModal";
 
 const Savings: React.FC = () => {
   const savings = useSavingsStore((state) => state.savings);
   const addSavings = useSavingsStore((state) => state.addSavings);
   const removeSavings = useSavingsStore((state) => state.removeSavings);
   const [editingSavings, setEditingSavings] = React.useState<SavingsRow | null>(null);
-
   const [dialogOpen, setDialogOpen] = React.useState(false);
   const [newSavings, setNewSavings] = React.useState<SavingsRow>({
     name: "",
@@ -24,11 +19,55 @@ const Savings: React.FC = () => {
     category: "",
   });
 
+  const savingsFormFields: FormField[] = [
+  {
+    name: "name",
+    label: "Naam",
+    type: "text",
+    placeholder: "Naam",
+  },
+  {
+    name: "goal",
+    label: "Spaardoel",
+    type: "number",
+    placeholder: "Spaardoel (€)",
+    step: "0.01",
+  },
+  {
+    name: "amount",
+    label: "Bedrag",
+    type: "number",
+    placeholder: "Bedrag (€)",
+    step: "0.01",
+  }
+];
+
   const totalAmount = savings.reduce((sum, item) => sum + item.amount, 0);
     const formattedTotal = totalAmount.toLocaleString("nl-NL", {
       style: "currency",
       currency: "EUR",
   });
+
+  // For Savings we need to handle editing, so use a computed value
+  const activeSavings = editingSavings || newSavings;
+  const handleSavingsChange = (value: SavingsRow) => {
+    if (editingSavings) {
+      setEditingSavings(value);
+    } else {
+      setNewSavings(value);
+    }
+  };
+
+  const handleSavingsSubmit = () => {
+    if (editingSavings) {
+      useSavingsStore.getState().updateSavings(editingSavings);
+      setEditingSavings(null);
+    } else {
+      addSavings(newSavings);
+      setNewSavings({ name: "", amount: 0, goal: 0, date: "", category: "" });
+    }
+    setDialogOpen(false);
+  };
 
   return (
     <PageLayout title="Spaarpotjes">
@@ -63,98 +102,16 @@ const Savings: React.FC = () => {
         ))}
       </div>
 
-      {/* + button en de modal */}
-      <div className="fixed bottom-6 right-6 z-50">
-        <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-          <DialogTrigger asChild>
-            <Button
-              className="rounded-full w-12 h-12 p-0 shadow-lg"
-              title="Toevoegen"
-              onClick={() => {
-                setEditingSavings(null);
-                setNewSavings({ name: "", amount: 0, goal: 0, date: "", category: "" });
-              }}
-            >
-              <Plus className="w-6 h-6" />
-            </Button>
-          </DialogTrigger>
-          <DialogContent>
-            <DialogHeader>
-              {editingSavings ? "Spaarpot bewerken" : "Nieuwe spaarpot toevoegen"}
-            </DialogHeader>
-            <div className="space-y-3">
-              <Input
-                placeholder="Naam"
-                value={editingSavings ? editingSavings.name : newSavings.name}
-                onChange={(e) => {
-                  const value = e.target.value;
-                  if (editingSavings) {
-                    setEditingSavings({ ...editingSavings, name: value });
-                  } else {
-                    setNewSavings({ ...newSavings, name: value });
-                  }
-                }}
-              />
-              <Input
-                placeholder="Spaardoel (€)"
-                value={editingSavings
-                  ? editingSavings.goal === 0 || editingSavings.goal === undefined ? "" : editingSavings.goal
-                  : newSavings.goal === 0 || newSavings.goal === undefined ? "" : newSavings.goal}
-                onChange={(e) => {
-                  const value = Number(e.target.value.replace(",", "."));
-                  if (editingSavings) {
-                    setEditingSavings({ ...editingSavings, goal: value });
-                  } else {
-                    setNewSavings({ ...newSavings, goal: value });
-                  }
-                }}
-              />
-              <Input
-                placeholder="Bedrag (€)"
-                value={editingSavings
-                  ? editingSavings.amount === 0 || editingSavings.amount === undefined ? "" : editingSavings.amount
-                  : newSavings.amount === 0 || newSavings.amount === undefined ? "" : newSavings.amount}
-                onChange={(e) => {
-                  const value = Number(e.target.value.replace(",", "."));
-                  if (editingSavings) {
-                    setEditingSavings({ ...editingSavings, amount: value });
-                  } else {
-                    setNewSavings({ ...newSavings, amount: value });
-                  }
-                }}
-              />
-              {/* <Input
-                placeholder="Datum (YYYY-MM-DD)"
-                type="date"
-                value={editingSavings ? editingSavings.date : newSavings.date}
-                onChange={(e) => {
-                  const value = e.target.value;
-                  if (editingSavings) {
-                    setEditingSavings({ ...editingSavings, date: value });
-                  } else {
-                    setNewSavings({ ...newSavings, date: value });
-                  }
-                }}
-              /> */}
-              <Button
-                onClick={() => {
-                  if (editingSavings) {
-                    useSavingsStore.getState().updateSavings(editingSavings);
-                    setEditingSavings(null);
-                  } else {
-                    addSavings(newSavings);
-                    setNewSavings({ name: "", amount: 0, goal: 0, date: "", category: "" });
-                  }
-                  setDialogOpen(false);
-                }}
-                className="w-full"
-              >
-                {editingSavings ? "Opslaan" : "Toevoegen"}
-              </Button>
-            </div>
-          </DialogContent>
-        </Dialog>
-      </div>
+      <FormModal
+        title={editingSavings ? "Spaarpot bewerken" : "Nieuwe spaarpot toevoegen"}
+        fields={savingsFormFields}
+        value={activeSavings}
+        onChange={handleSavingsChange}
+        onSubmit={handleSavingsSubmit}
+        submitLabel={editingSavings ? "Opslaan" : "Toevoegen"}
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
+        />
     </PageLayout>
   );
 };

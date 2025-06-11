@@ -2,7 +2,6 @@ import React from "react";
 import { BaseTable } from "@/components/BaseTable";
 import PageLayout from "@/components/PageLayout";
 import OverviewCard from "@/components/OverviewCard";
-import { Plus } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
@@ -14,23 +13,10 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
 import { useInvestmentsStore, InvestmentsRow } from "@/stores/investmensStore";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { createInvestmentsColumns } from "@/utils/tableColumns";
 import { useFilteredData } from "@/hooks/useFilteredData";
+import { FormModal, FormField } from "@/components/FormModal";
 
 const Investments: React.FC = () => {
   const investments = useInvestmentsStore((state) => state.investments);
@@ -47,6 +33,67 @@ const Investments: React.FC = () => {
     category: "",
     note: "",
   });
+
+  const investmentFormFields: FormField[] = [
+    {
+      name: "name",
+      label: "Naam",
+      type: "text",
+      placeholder: "Naam of $TSLA",
+      fullWidth: true,
+    },
+    {
+      name: "symbol",
+      label: "Symbool",
+      type: "text",
+      placeholder: "Symbool (bijv. XRP-EUR)",
+    },
+    {
+      name: "amountInvested",
+      label: "Bedrag",
+      type: "number",
+      placeholder: "Bedrag (€)",
+      step: "1.00",
+    },
+    {
+      name: "pricePerUnit",
+      label: "Prijs per stuk",
+      type: "number",
+      placeholder: "Prijs per stuk (€)",
+      step: "0.01",
+    },
+    {
+      name: "units",
+      label: "Aantal",
+      type: "number",
+      placeholder: "Aantal",
+      step: "0.0000001",
+    },
+    {
+      name: "date",
+      label: "Datum",
+      type: "date",
+    },
+    {
+      name: "category",
+      label: "Categorie",
+      type: "select",
+      placeholder: "Selecteer categorie",
+      options: [
+        { value: "Aandelen", label: "Aandelen" },
+        { value: "Beleggingsfonds", label: "Beleggingsfonds" },
+        { value: "Crypto", label: "Crypto" },
+        { value: "ETF", label: "ETF" },
+      ],
+    },
+    {
+      name: "note",
+      label: "Notitie",
+      type: "textarea",
+      placeholder: "Notitie (optioneel)",
+      fullWidth: true,
+    },
+  ];
 
   // Defineer category opties
   const categoryOptions = [
@@ -151,112 +198,16 @@ const Investments: React.FC = () => {
         data={filteredData}
       />
       
-      {/* + button en de modal */}
-      <div className="fixed bottom-6 right-6 z-50">
-        <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-          <DialogTrigger asChild>
-            <Button
-              className="rounded-full w-12 h-12 p-0 shadow-lg"
-              title="Toevoegen"
-            >
-              <Plus className="w-6 h-6" />
-            </Button>
-          </DialogTrigger>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Nieuwe investering toevoegen</DialogTitle>
-            </DialogHeader>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-              <Input
-                placeholder="Naam of $TSLA"
-                value={newInvestment.name}
-                onChange={(e) =>
-                  setNewInvestment({ ...newInvestment, name: e.target.value })
-                }
-                className="col-span-2"
-              />
-              <Input
-                placeholder="Symbool (bijv. XRP-EUR)"
-                value={newInvestment.symbol}
-                onChange={(e) =>
-                  setNewInvestment({ ...newInvestment, symbol: e.target.value })
-                }
-              />
-              <Input
-                placeholder="Bedrag (€)"
-                value={newInvestment.amountInvested}
-                onChange={(e) =>
-                  setNewInvestment({
-                    ...newInvestment,
-                    amountInvested: parseFloat(e.target.value.replace(",", ".")),
-                  })
-                }
-                type="number"
-                step="1.00"
-              />
-              <Input
-                placeholder="Prijs per stuk (€)"
-                type="number"
-                step="0.01"
-                value={newInvestment.pricePerUnit || ""}
-                onChange={(e) =>
-                  setNewInvestment({
-                    ...newInvestment,
-                    pricePerUnit: parseFloat(e.target.value.replace(",", ".")),
-                  })
-                }
-              />
-              <Input
-                placeholder="Aantal"
-                type="number"
-                step="0.0000001"
-                value={newInvestment.units || ""}
-                onChange={(e) =>
-                  setNewInvestment({
-                    ...newInvestment,
-                    units: parseFloat(e.target.value.replace(",", ".")),
-                  })
-                }
-              />
-              <Input
-                type="date"
-                value={newInvestment.date}
-                onChange={(e) =>
-                  setNewInvestment({ ...newInvestment, date: e.target.value })
-                }
-              />
-              <Select
-                value={newInvestment.category}
-                onValueChange={(value) =>
-                  setNewInvestment({ ...newInvestment, category: value })
-                }
-              >
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Selecteer categorie" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="Aandelen">Aandelen</SelectItem>
-                  <SelectItem value="Beleggingsfonds">Beleggingsfonds</SelectItem>
-                  <SelectItem value="Crypto">Crypto</SelectItem>
-                  <SelectItem value="ETF">ETF</SelectItem>
-                </SelectContent>
-              </Select>
-              <textarea
-                placeholder="Notitie (optioneel)"
-                value={newInvestment.note}
-                onChange={(e) =>
-                  setNewInvestment({ ...newInvestment, note: e.target.value })
-                }
-                className="col-span-2 border rounded px-3 py-2 text-sm"
-              />
-              <Button onClick={handleAddInvestment} className="w-full col-span-2">
-                Toevoegen
-              </Button>
-            </div>
-          </DialogContent>
-        </Dialog>
-      </div>
-
+      <FormModal
+        title="Nieuwe investering toevoegen"
+        fields={investmentFormFields}
+        value={newInvestment}
+        onChange={setNewInvestment}
+        onSubmit={handleAddInvestment}
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
+        gridLayout={true}
+      />
     </PageLayout>
   );
 };

@@ -2,7 +2,6 @@ import React from "react";
 import { BaseTable } from "@/components/BaseTable";
 import PageLayout from "@/components/PageLayout";
 import OverviewCard from "@/components/OverviewCard";
-import { Plus } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
@@ -14,10 +13,10 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { useExpenseStore, ExpenseRow } from "@/stores/expenseStore";
 import { createExpenseColumns } from "@/utils/tableColumns";
 import { useFilteredData } from "@/hooks/useFilteredData";
+import { FormModal, FormField } from "@/components/FormModal";
 
 const Expenses: React.FC = () => {
   const expenses = useExpenseStore((state) => state.expenses);
@@ -30,6 +29,40 @@ const Expenses: React.FC = () => {
     date: "",
     category: "",
   });
+
+  const expenseFormFields: FormField[] = [
+  {
+    name: "name",
+    label: "Naam",
+    type: "text",
+    placeholder: "Naam",
+  },
+  {
+    name: "amount",
+    label: "Bedrag",
+    type: "number",
+    placeholder: "Bedrag (€)",
+    step: "0.01",
+  },
+  {
+    name: "date",
+    label: "Datum",
+    type: "date",
+    placeholder: "Datum",
+  },
+  {
+    name: "category",
+    label: "Categorie",
+    type: "select",
+    placeholder: "Selecteer categorie",
+    options: [
+      { value: "Eten", label: "Eten" },
+      { value: "Transport", label: "Transport" },
+      { value: "Entertainment", label: "Entertainment" },
+      { value: "Anders", label: "Anders" },
+    ],
+  },
+];
 
   // Defineer category opties
   const categoryOptions = [
@@ -121,62 +154,15 @@ const Expenses: React.FC = () => {
         data={filteredData}
       />
 
-      <div className="fixed bottom-6 right-6 z-50">
-        <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-          <DialogTrigger asChild>
-            <Button
-              className="rounded-full w-12 h-12 p-0 shadow-lg"
-              title="Toevoegen"
-            >
-              <Plus className="w-6 h-6" />
-            </Button>
-          </DialogTrigger>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Nieuwe uitgave toevoegen</DialogTitle>
-            </DialogHeader>
-            <div className="space-y-3">
-              <Input
-                placeholder="Naam"
-                value={newExpense.name}
-                onChange={(e) =>
-                  setNewExpense({ ...newExpense, name: e.target.value })
-                }
-              />
-              <Input
-                placeholder="Bedrag (€)"
-                value={newExpense.amount}
-                onChange={(e) =>
-                  setNewExpense({
-                    ...newExpense,
-                    amount: parseFloat(e.target.value.replace(",", ".")),
-                  })
-                }
-                type="number"
-                step="0.01"
-              />
-              <Input
-                placeholder="Datum (YYYY-MM-DD)"
-                type="date"
-                value={newExpense.date}
-                onChange={(e) =>
-                  setNewExpense({ ...newExpense, date: e.target.value })
-                }
-              />
-              <Input
-                placeholder="Categorie"
-                value={newExpense.category}
-                onChange={(e) =>
-                  setNewExpense({ ...newExpense, category: e.target.value })
-                }
-              />
-              <Button onClick={handleAddExpense} className="w-full">
-                Toevoegen
-              </Button>
-            </div>
-          </DialogContent>
-        </Dialog>
-      </div>
+      <FormModal
+        title="Nieuwe uitgave toevoegen"
+        fields={expenseFormFields}
+        value={newExpense}
+        onChange={setNewExpense}
+        onSubmit={handleAddExpense}
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
+      />
     </PageLayout>
   );
 };
