@@ -1,10 +1,10 @@
 import React from "react";
 import PageLayout from "@/components/PageLayout";
 import OverviewCard from "@/components/OverviewCard";
-import { useSavingsStore, SavingsRow } from "@/stores/savingsStore";
+import { useSavingsStore, type SavingsRow } from "@/stores/savingsStore";
 import SavingsCard from "@/components/SavingsCard";
 import { Separator } from "@/components/ui/separator";
-import { FormModal, FormField } from "@/components/FormModal";
+import { FormModal, type FormField } from "@/components/FormModal";
 
 const Savings: React.FC = () => {
   const savings = useSavingsStore((state) => state.savings);
@@ -87,15 +87,15 @@ const Savings: React.FC = () => {
 
       {/* Spaargeld cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 xl:grid-cols-5 gap-8 px-4 pb-6 place-items-stretch">      
-        {savings.map((savings) => (
+        {savings.map((s) => (
           <SavingsCard
-            key={savings.name}
-            title={savings.name}
-            amount={savings.amount}
-            goal={savings.goal ?? 0}
-            onDelete={() => removeSavings(savings)}
+            key={s.name}
+            title={s.name}
+            amount={s.amount}
+            goal={s.goal ?? 0}
+            onDelete={() => removeSavings(s)}
             onEdit={() => {
-              setEditingSavings(savings);
+              setEditingSavings(s);
               setDialogOpen(true);
             }}
           />
