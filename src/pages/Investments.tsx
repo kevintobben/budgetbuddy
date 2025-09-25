@@ -24,6 +24,7 @@ const Investments: React.FC = () => {
   const removeInvestment = useInvestmentsStore((state) => state.removeInvestment);
   const [dialogOpen, setDialogOpen] = React.useState(false);
   const [newInvestment, setNewInvestment] = React.useState<InvestmentsRow>({
+    id: null,
     name: "",
     symbol: "",
     amountInvested: 0,
@@ -116,7 +117,7 @@ const Investments: React.FC = () => {
     };
     
     addInvestment(calculatedInvestment);
-    setNewInvestment({ name: "", symbol: "", amountInvested: 0, unitsReceived: 0, pricePerUnit: 0, date: "", category: "", note: "" });
+    setNewInvestment({ id: null, name: "", symbol: "", amountInvested: 0, unitsReceived: 0, pricePerUnit: 0, date: "", category: "", note: "" });
     setDialogOpen(false);
   };
 

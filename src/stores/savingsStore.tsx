@@ -1,7 +1,9 @@
+import { Key } from "react";
 import { create } from "zustand"
 import { persist } from "zustand/middleware"
 
 export type SavingsRow = {
+  id: Key | null | undefined;
   name: string;
   amount: number;
   goal?: number;

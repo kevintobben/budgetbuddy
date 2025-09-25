@@ -1,7 +1,9 @@
+import { Key } from "react";
 import { create } from "zustand"
 import { persist } from "zustand/middleware"
 
 export type InvestmentsRow = {
+  id: Key | null | undefined;
   name: string
   symbol: string
   amountInvested: number

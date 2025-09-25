@@ -24,6 +24,7 @@ const FixedExpenses: React.FC = () => {
   const removeFixedExpense = useFixedExpensesStore((state) => state.removeFixedExpense);
   const [dialogOpen, setDialogOpen] = React.useState(false);
   const [newFixedExpense, setNewFixedExpense] = React.useState<FixedExpenseRow>({
+    id: null,
     name: "",
     amount: 0,
     date: "",
@@ -81,7 +82,7 @@ const FixedExpenses: React.FC = () => {
 
   const handleAddFixedExpense = () => {
     addFixedExpense(newFixedExpense);
-    setNewFixedExpense({ name: "", amount: 0, date: "", category: "" });
+    setNewFixedExpense({ id: null, name: "", amount: 0, date: "", category: "" });
     setDialogOpen(false);
   };
 

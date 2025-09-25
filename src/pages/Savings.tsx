@@ -13,6 +13,7 @@ const Savings: React.FC = () => {
   const [editingSavings, setEditingSavings] = React.useState<SavingsRow | null>(null);
   const [dialogOpen, setDialogOpen] = React.useState(false);
   const [newSavings, setNewSavings] = React.useState<SavingsRow>({
+    id: null,
     name: "",
     amount: 0,
     date: "",
@@ -64,7 +65,7 @@ const Savings: React.FC = () => {
       setEditingSavings(null);
     } else {
       addSavings(newSavings);
-      setNewSavings({ name: "", amount: 0, goal: 0, date: "", category: "" });
+      setNewSavings({ id: null, name: "", amount: 0, goal: 0, date: "", category: "" });
     }
     setDialogOpen(false);
   };
@@ -89,7 +90,7 @@ const Savings: React.FC = () => {
       <div className="grid grid-cols-1 md:grid-cols-3 xl:grid-cols-5 gap-8 px-4 pb-6 place-items-stretch">      
         {savings.map((s) => (
           <SavingsCard
-            key={s.name}
+            key={s.id}
             title={s.name}
             amount={s.amount}
             goal={s.goal ?? 0}

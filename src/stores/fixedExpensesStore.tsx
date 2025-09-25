@@ -1,6 +1,8 @@
+import { Key } from 'react';
 import { create } from 'zustand';
 
 export interface FixedExpenseRow {
+  id: Key | null | undefined;
   name: string;
   amount: number;
   date: string;

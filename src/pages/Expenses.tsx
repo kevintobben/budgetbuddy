@@ -24,6 +24,7 @@ const Expenses: React.FC = () => {
   const removeExpense = useExpenseStore((state) => state.removeExpense);
   const [dialogOpen, setDialogOpen] = React.useState(false);
   const [newExpense, setNewExpense] = React.useState<ExpenseRow>({
+    id: null,
     name: "",
     amount: 0,
     date: "",
@@ -81,7 +82,7 @@ const Expenses: React.FC = () => {
 
   const handleAddExpense = () => {
     addExpense(newExpense);
-    setNewExpense({ name: "", amount: 0, date: "", category: "" });
+    setNewExpense({ id: null, name: "", amount: 0, date: "", category: "" });
     setDialogOpen(false);
   };
 
