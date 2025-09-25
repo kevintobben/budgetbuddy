@@ -22,18 +22,27 @@ export const useSavingsStore = create<SavingsStore>()(
   persist(
     (set, get) => ({
       savings: [],
-      addSavings: (saving) => set({ savings: [...get().savings, saving] }),
+      // geef elk nieuw item een id als die ontbreekt
+      addSavings: (saving) =>
+        set({
+          savings: [
+            ...get().savings,
+            { ...saving, id: saving.id ?? crypto.randomUUID() },
+          ],
+        }),
+      // verwijder op id
       removeSavings: (saving) =>
-        set({ savings: get().savings.filter((i) => i !== saving) }),
-      updateSavings: (updated: SavingsRow) =>
+        set({
+          savings: get().savings.filter((i) => i.id !== saving.id),
+        }),
+      // update op id
+      updateSavings: (updated) =>
         set({
           savings: get().savings.map((item) =>
-            item.name === updated.name ? updated : item
+            item.id === updated.id ? updated : item
           ),
         }),
     }),
-    {
-      name: "saving-storage",
-    }
+    { name: "saving-storage" }
   )
 )

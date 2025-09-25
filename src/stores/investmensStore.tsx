@@ -35,10 +35,15 @@ export const useInvestmentsStore = create<InvestmentsStore>()(
           amountInvested: investment.amountInvested || 
             parseFloat((investment.pricePerUnit * investment.unitsReceived).toFixed(2))
         };
-        set({ investments: [...get().investments, calculatedInvestment] });
+        set({
+          investments: [
+            ...get().investments,
+            { ...calculatedInvestment, id: investment.id ?? crypto.randomUUID() },
+          ],
+        });
       },
       removeInvestment: (investment) =>
-        set({ investments: get().investments.filter((i) => i !== investment) }),
+        set({ investments: get().investments.filter((i) => i.id !== investment.id) }),
       updateInvestment: (oldInvestment, newInvestment) => {
         // Zorg ervoor dat amountInvest is berekend voor de bijgewerkte investering
         const calculatedInvestment = { 
@@ -50,7 +55,7 @@ export const useInvestmentsStore = create<InvestmentsStore>()(
         };
         set({ 
           investments: get().investments.map((i) => 
-            i === oldInvestment ? calculatedInvestment : i
+            i.id === oldInvestment.id ? { ...calculatedInvestment, id: oldInvestment.id } : i
           ) 
         });
       },

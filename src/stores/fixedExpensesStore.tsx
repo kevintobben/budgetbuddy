@@ -18,12 +18,15 @@ interface FixedExpensesState {
 
 export const useFixedExpensesStore = create<FixedExpensesState>((set) => ({
   fixedExpenses: [],
-  addFixedExpense: (fixedExpense) => 
-    set((state) => ({ 
-      fixedExpenses: [...state.fixedExpenses, fixedExpense] 
+  addFixedExpense: (fixedExpense) =>
+    set((state) => ({
+      fixedExpenses: [
+        ...state.fixedExpenses,
+        { ...fixedExpense, id: fixedExpense.id ?? crypto.randomUUID() },
+      ],
     })),
-  removeFixedExpense: (fixedExpense) => 
-    set((state) => ({ 
-      fixedExpenses: state.fixedExpenses.filter((s) => s.name !== fixedExpense.name) 
+  removeFixedExpense: (fixedExpense) =>
+    set((state) => ({
+      fixedExpenses: state.fixedExpenses.filter((s) => s.id !== fixedExpense.id),
     })),
 }));

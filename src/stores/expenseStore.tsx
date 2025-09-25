@@ -20,9 +20,15 @@ export const useExpenseStore = create<ExpenseStore>()(
   persist(
     (set, get) => ({
       expenses: [],
-      addExpense: (expense) => set({ expenses: [...get().expenses, expense] }),
+      addExpense: (expense) =>
+        set({
+          expenses: [
+            ...get().expenses,
+            { ...expense, id: expense.id ?? crypto.randomUUID() },
+          ],
+        }),
       removeExpense: (expense) =>
-        set({ expenses: get().expenses.filter((i) => i !== expense) }),
+        set({ expenses: get().expenses.filter((i) => i.id !== expense.id) }),
     }),
     {
       name: "expense-storage",
